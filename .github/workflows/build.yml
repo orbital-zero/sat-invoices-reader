@@ -44,6 +44,7 @@ jobs:
         python -m coverage run --source=classes -m unittest discover -s ./test -p "*Test.py"
         python -m coverage lcov -o ./coverage/lcov.info
         python -m coverage xml -o ./coverage/coverage.xml
+        sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g" ./coverage/coverage.xml
         # python -m coverage run --source=classes -m pytest test
     - name: Coveralls Scan
       if: ${{ success() }}
@@ -57,8 +58,6 @@ jobs:
       # You may pin to the exact commit or the version.
       # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
       # https://github.com/marketplace/actions/sonarcloud-scan
-      run: |
-          sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g" ./coverage/coverage.xml
       uses: SonarSource/sonarcloud-github-action@v1.6
       with:
         # Set the sonar.projectBaseDir analysis property
