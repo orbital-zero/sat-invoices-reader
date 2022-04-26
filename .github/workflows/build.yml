@@ -6,7 +6,7 @@ name: Python package
 
 on:
   push:
-    branches: [ feature/* ]
+    branches: [ feature/*, , release/* ]
   pull_request:
     branches: [ master ]
 
@@ -66,6 +66,7 @@ jobs:
           -Dsonar.tests=test/
           -Dsonar.sources=classes/
           -Dsonar.python.flake8.reportPaths=./coverage/flake-report.txt
+          -Dsonar.python.version=3.8
       #  -Dsonar.test.exclusions=tests/**
       #  -Dsonar.verbose=true
       env:
