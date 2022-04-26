@@ -44,8 +44,9 @@ jobs:
         python -m coverage run --source=classes -m unittest discover -s ./test -p "*Test.py"
         python -m coverage lcov -o ./coverage/lcov.info
         python -m coverage xml -o ./coverage/coverage.xml
-        sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g" ./coverage/coverage.xml
-        # python -m coverage run --source=classes -m pytest test
+        sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
+      # python -m coverage run --source=classes -m pytest test
+      
     - name: Coveralls Scan
       if: ${{ success() }}
       uses: coverallsapp/github-action@1.1.3
