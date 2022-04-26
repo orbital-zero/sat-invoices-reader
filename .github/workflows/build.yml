@@ -21,7 +21,9 @@ jobs:
         python-version: ["3.8"]
 
     steps:
-    - uses: actions/checkout@v3
+    uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -44,7 +46,7 @@ jobs:
         python -m coverage run --source=classes -m unittest discover -s ./test -p "*Test.py"
         python -m coverage lcov -o ./coverage/lcov.info
         python -m coverage xml -o ./coverage/coverage.xml
-        sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
+      #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
       # python -m coverage run --source=classes -m pytest test
       
     - name: Coveralls Scan
