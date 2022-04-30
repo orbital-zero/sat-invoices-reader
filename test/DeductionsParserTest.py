@@ -24,7 +24,7 @@ class DeductionsParserTest(unittest.TestCase):
         com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
 
         self.assertIsNotNone(com.issuer)
-        self.assertEquals(com.issuer.rfc, 'ABC123456T5')
+        self.assertEqual(com.issuer.rfc, 'ABC123456T5')
         self.assertIsNotNone(com.concepts[0])
-        self.assertEquals(com.total, '1000.0')
+        self.assertEqual(com.total, '1000.0')
         

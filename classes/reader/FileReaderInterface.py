@@ -8,8 +8,7 @@ class FileReaderInterface(metaclass=abc.ABCMeta):
 
     @classmethod
     def __subclasshook__(cls, subclass):
-        return (hasattr(subclass, 'do_in_list') and
-                callable(subclass.do_in_list))
+        return (hasattr(subclass, 'do_in_list') and callable(subclass.do_in_list))
 
     @abc.abstractmethod
     def do_in_list(self, path: str, _callback: typing.Any):

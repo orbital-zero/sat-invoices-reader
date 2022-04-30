@@ -9,8 +9,7 @@ class InvoiceParserInterface(metaclass=abc.ABCMeta):
 
     @classmethod
     def __subclasshook__(cls, subclass):
-        return (hasattr(subclass, 'parse') and
-                callable(subclass.parse))
+        return (hasattr(subclass, 'parse') and callable(subclass.parse))
 
     @abc.abstractmethod
     def parse(self, file_name: str, file) -> CFDI:
