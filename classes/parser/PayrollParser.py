@@ -57,10 +57,10 @@ class PayrollParser(InvoiceParserInterface):
 
         _concept = root.getElement('conceptos/concepto')
 
-        if(_concept is not None):
-            _concept = _concept[0] if isinstance(_concept, list) else _concept
-            concept = Concept(_concept.get('descripcion'))
-            cfdi.setConcepts([concept])
+        if(_concept is not None and isinstance(_concept, list)):
+            cfdi.setConcepts([Concept(_concept[0].get('descripcion'))])
+        else:
+            cfdi.setConcepts([Concept(_concept.get('descripcion'))])
 
         _payroll = root.getElement('complemento/nomina')
 
@@ -73,6 +73,7 @@ class PayrollParser(InvoiceParserInterface):
                 'complemento/nomina/deducciones/deduccion')
 
             cfdi.setPayroll(payroll)
+            self.assing_deductions(_deductions, cfdi)
 
             if isinstance(_deductions, list):
 
@@ -89,3 +90,12 @@ class PayrollParser(InvoiceParserInterface):
     def get_paid_tax_deduction(self, _deduc):
         if _deduc.get('tipodeduccion') == '002':
             return _deduc.get('importe') or _deduc.get('importegravado')
+
+    def assing_deductions(self, _deductions, cfdi):
+        if isinstance(_deductions, list):
+
+            for _deduc in _deductions:
+                cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deduc))
+
+        elif _deductions is not None:
+            cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deductions))

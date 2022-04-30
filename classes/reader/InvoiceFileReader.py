@@ -29,32 +29,17 @@ class InvoiceFileReader(FileReaderInterface):
     def read_zipped_files(self, read_zip: bool):
         self._is_zipped_file = read_zip
 
-    def do_in_list(self, path: str, _callback: typing.Any):
+    def do_in_list(self, path: str, _callback: typing.Any, filter: str):
 
-        if self._is_zipped_file:
-            self.__read_zip_files(path, _callback)
-        else:
-            self.__read_xml_files(path, _callback)
-
-    def __read_xml_files(self, source_path: str, _callback: Callback):
-
-        for filename in Path(source_path).glob('**/*.xml'):
+        for filename in Path(path).glob(filter):
             try:
-                _callback.function(filename)
+                if self._is_zipped_file:
+                    self.__read_zip_content(filename, _callback)
+                else:
+                    _callback.function(filename)
             except Exception as e:
                 _callback.errors.append(e)
-                if not self._ignore_err:
-                    logging.exception(
-                        'Error with file {0} , skipping...'.format(filename))
-
-    def __read_zip_files(self, source_path: str, _callback: Callback):
-
-        for filename in Path(source_path).glob('**/*.zip'):
-            try:
-                self.__read_zip_content(filename, _callback)
-            except Exception as e:
-                _callback.errors.append(e)
-                if not self._ignore_err:
+                if not self.ignore_errors:
                     logging.exception(
                         'Error with file {0} , skipping...'.format(filename))
                 continue
@@ -70,7 +55,7 @@ class InvoiceFileReader(FileReaderInterface):
                 _callback.function(filename, zip_file)
             except Exception as e:
                 _callback.errors.append(e)
-                if not self._ignore_err:
+                if not self.ignore_errors:
                     logging.exception(
                         'Error with file {0} , skipping...'.format(filename))
                 continue

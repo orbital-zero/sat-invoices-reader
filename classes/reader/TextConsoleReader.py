@@ -69,6 +69,7 @@ class TextConsoleReader:
 
         self.callback = Callback()
         custom_parser = self.__get_tree_parser()
+        file_filter = ''
 
         if self.file_reader.is_zipped_file:
             # read file into zip
@@ -77,13 +78,16 @@ class TextConsoleReader:
                 custom_parser,
                 zip_file)
 
+            file_filter = '**/*.zip'
         else:
-            # read file
+            # read files
             fx = lambda filename: self.__read_payroll_file(
                 filename, custom_parser)
 
+            file_filter = '**/*.xml'
+
         self.callback.set_function(fx)
-        self._file_reader.do_in_list(path, self.callback)
+        self._file_reader.do_in_list(path, self.callback, file_filter)
 
     def read_deductions(self, path: str):
 
@@ -104,6 +108,7 @@ class TextConsoleReader:
 
         self.callback = Callback()
         custom_parser = self.__get_tree_parser()
+        file_filter = ''
 
         if self.file_reader.is_zipped_file:
             # read file into zip
@@ -111,13 +116,18 @@ class TextConsoleReader:
                 filename,
                 custom_parser,
                 zip_file)
+
+            file_filter = '**/*.zip'
+
         else:
             # read file
             fx = lambda filename: self.__read_deduction_file(
                 filename, custom_parser)
 
+            file_filter = '**/*.xml'
+
         self.callback.set_function(fx)
-        self._file_reader.do_in_list(path, self.callback)
+        self._file_reader.do_in_list(path, self.callback, file_filter)
 
     def __read_payroll_zip_file(
             self, filename: str, custom_parser: etree.XMLParser, zip_file: zipfile.ZipFile) -> List:

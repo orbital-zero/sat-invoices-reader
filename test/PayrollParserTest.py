@@ -24,7 +24,7 @@ class PayrollParserTest(unittest.TestCase):
         com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
 
         self.assertIsNotNone(com.issuer)
-        self.assertEquals(com.issuer.rfc, 'ABC123456T5')
+        self.assertEqual(com.issuer.rfc, 'ABC123456T5')
         self.assertIsNotNone(com.payroll)
         self.assertIsNotNone(com.concepts[0])
         

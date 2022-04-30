@@ -13,7 +13,8 @@ class CustomElement(etree.ElementBase):
     __XPATH_GET_ATTR = "(./@*[re:test(local-name(), '^{0}$','i')])[1]"
     __XPATH_SET_ATTR = "name(./@*[re:test(local-name(), '^{0}$','i')])"
     __XPATH_FIND_NESTED_EL = "/*[re:test(local-name(), '^{0}$','i')]"
-    __NESTED_PATH_PATTERN = r"^(([*]?:?\w)+(/)+([*]?:?\w)+)+$"  # identify nested path
+    # identify nested path
+    __NESTED_PATH_PATTERN = r"^(([*]?:?\w)+(/)+([*]?:?\w)+)+$"
 
     @property
     def namespaces(self):
@@ -69,10 +70,10 @@ class CustomElement(etree.ElementBase):
 
         if match and isinstance(match, Match):
             path = self.getXpath(path.split('/'))
-            el = super().xpath('.'+path, namespaces=ns)
+            el = super().xpath('.' + path, namespaces=ns)
         else:
             path = self.getXpath([path])
-            el = super().xpath('.'+path, namespaces=ns)
+            el = super().xpath('.' + path, namespaces=ns)
 
         return self.__empty_filter(el)
 
@@ -81,7 +82,8 @@ class CustomElement(etree.ElementBase):
 
         if not namespaces:
             # print(self._namespaces)
-            return self._namespaces if hasattr(self, 'namespaces') else self.__NS_MAP
+            return self._namespaces if hasattr(
+                self, 'namespaces') else self.__NS_MAP
         else:
             return namespaces
 

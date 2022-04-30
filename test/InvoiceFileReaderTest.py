@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import logging
+import logging.config
+
 from classes.reader.Callback import Callback
 from classes.reader.InvoiceFileReader import InvoiceFileReader
 from pathlib import Path
@@ -7,6 +10,7 @@ from pathlib import Path
 import zipfile
 import unittest
 
+logger = logging.getLogger(__name__)
 class InvoiceFileReaderTest(unittest.TestCase):
 
     @classmethod
@@ -14,13 +18,14 @@ class InvoiceFileReaderTest(unittest.TestCase):
         cls.file_reader = InvoiceFileReader()
         cls.zip_path = str(Path(__file__).parent)+"/resources/payroll/zip_file"
         cls.one_file = str(Path(__file__).parent)+"/resources/payroll/one_file"
+        logging.config.fileConfig(fname='./test/logger-tests.conf', disable_existing_loggers=False)
 
     def test_list_xml_files(self):
         
         callback = Callback()
         callback.set_function(lambda filename: self.__fault_file_callback(filename, callback.result))
         # self.file_reader.read_ziped_files(False)  #  False by default
-        self.file_reader.do_in_list(self.one_file, callback)
+        self.file_reader.do_in_list(self.one_file, callback, '**/*.xml')
         self.assertEquals(len(callback.result), 1)
         
 
@@ -31,7 +36,7 @@ class InvoiceFileReaderTest(unittest.TestCase):
         callback.set_function(fx)
 
         self.file_reader.read_zipped_files(True)
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
         self.assertEquals(len(callback.result), 3)
 
     def __fault_file_callback(self, filename:str, _result):
@@ -41,7 +46,8 @@ class InvoiceFileReaderTest(unittest.TestCase):
     def __fault_zip_callback(self, filename:str, zip_file:zipfile.ZipFile, _result):
         """ Append to List readed file names in zip """
         _result.append(filename)
-        
+
+    
     def test_list_zip_callback_err(self):
         
         callback = Callback()
@@ -49,7 +55,7 @@ class InvoiceFileReaderTest(unittest.TestCase):
         callback.set_function(fx)
 
         self.file_reader.read_zipped_files(True)
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
         self.assertEquals(len(callback.errors), 3)
     
     def __fault_err_callback(self, filename:str, zip_file:zipfile.ZipFile):
@@ -64,5 +70,5 @@ class InvoiceFileReaderTest(unittest.TestCase):
 
         self.file_reader.read_zipped_files(True)
         self.file_reader.set_ignore_errors(True)
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
         self.assertEquals(len(callback.errors), 3)

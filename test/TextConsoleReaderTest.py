@@ -7,7 +7,10 @@ from classes.reader.TextConsoleReader import TextConsoleReader
 from pathlib import Path
 
 import unittest
+import logging
+import logging.config
 
+logger = logging.getLogger(__name__)
 
 class TextConsoleReaderTest(unittest.TestCase):
 
@@ -18,6 +21,7 @@ class TextConsoleReaderTest(unittest.TestCase):
         cls.reader.setDeductuctionParser(DeductionsParser())
         cls.reader.setPayrollParser(PayrollParser())
         cls.reader.setFileReader(InvoiceFileReader())
+        logging.config.fileConfig(fname='./test/logger-tests.conf', disable_existing_loggers=False)
 
     def test_read_payroll_invoce(self):
 
