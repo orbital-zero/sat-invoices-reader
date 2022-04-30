@@ -75,16 +75,6 @@ class PayrollParser(InvoiceParserInterface):
             cfdi.setPayroll(payroll)
             self.assing_deductions(_deductions, cfdi)
 
-            if isinstance(_deductions, list):
-
-                for _deduc in _deductions:
-                    paidTax = self.get_paid_tax_deduction(_deduc)
-                    cfdi.payroll.setPaidTax(paidTax)
-
-            elif _deductions is not None:
-                paidTax = self.get_paid_tax_deduction(_deductions)
-                cfdi.payroll.setPaidTax(paidTax)
-
         return cfdi
 
     def get_paid_tax_deduction(self, _deduc):
@@ -95,7 +85,9 @@ class PayrollParser(InvoiceParserInterface):
         if isinstance(_deductions, list):
 
             for _deduc in _deductions:
-                cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deduc))
+                paidTax = self.get_paid_tax_deduction(_deduc)
+                if paidTax is not None:
+                    cfdi.payroll.setPaidTax(paidTax)
 
         elif _deductions is not None:
             cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deductions))

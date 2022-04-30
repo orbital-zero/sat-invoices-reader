@@ -2,6 +2,8 @@
 
 import logging
 import logging.config
+from plistlib import InvalidFileException
+from xml.dom import NotSupportedErr
 
 from classes.reader.Callback import Callback
 from classes.reader.InvoiceFileReader import InvoiceFileReader
@@ -26,7 +28,7 @@ class InvoiceFileReaderTest(unittest.TestCase):
         callback.set_function(lambda filename: self.__fault_file_callback(filename, callback.result))
         # self.file_reader.read_ziped_files(False)  #  False by default
         self.file_reader.do_in_list(self.one_file, callback, '**/*.xml')
-        self.assertEquals(len(callback.result), 1)
+        self.assertEqual(len(callback.result), 1)
         
 
     def test_list_zip_files(self):
@@ -46,7 +48,6 @@ class InvoiceFileReaderTest(unittest.TestCase):
     def __fault_zip_callback(self, filename:str, zip_file:zipfile.ZipFile, _result):
         """ Append to List readed file names in zip """
         _result.append(filename)
-
     
     def test_list_zip_callback_err(self):
         
@@ -72,3 +73,15 @@ class InvoiceFileReaderTest(unittest.TestCase):
         self.file_reader.set_ignore_errors(True)
         self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
         self.assertEqual(len(callback.errors), 3)
+
+      
+    def test_err_file_callback(self):
+        
+        callback = Callback()
+        def f(x):
+            raise Exception('foobar')
+        
+        callback.set_function(f)
+        
+        self.file_reader.do_in_list(self.one_file, callback, '**/*.xml')
+        self.assertEqual(len(callback.errors), 1)

@@ -47,7 +47,7 @@ class TextConsoleReader:
         elif _type == 'P':
             self.read_payroll(path)
         else:
-            raise NotSupportedErr('Invoce type not supported %(name)s' % _type)
+            raise NotSupportedErr('Invoce type not supported %s' % _type)
 
     def read_payroll(self, path: str):
 

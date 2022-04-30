@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from xml.dom import NotSupportedErr
 from classes.parser.DeductionsParser import DeductionsParser
 from classes.parser.PayrollParser import PayrollParser
 from classes.reader.InvoiceFileReader import InvoiceFileReader
@@ -51,3 +52,8 @@ class TextConsoleReaderTest(unittest.TestCase):
         self.reader.file_reader.read_zipped_files(True)
         self.reader.read(self.path, 'D')
         self.assertIsNotNone(self.reader.callback_result)
+
+    def test_err_not_supported(self):
+        with self.assertRaises(NotSupportedErr):
+            self.reader.read(self.path, 'X')
+        
