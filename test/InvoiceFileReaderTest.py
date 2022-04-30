@@ -37,7 +37,7 @@ class InvoiceFileReaderTest(unittest.TestCase):
 
         self.file_reader.read_zipped_files(True)
         self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
-        self.assertEquals(len(callback.result), 3)
+        self.assertEqual(len(callback.result), 3)
 
     def __fault_file_callback(self, filename:str, _result):
         """ Append to List readed file names"""
@@ -56,7 +56,7 @@ class InvoiceFileReaderTest(unittest.TestCase):
 
         self.file_reader.read_zipped_files(True)
         self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
-        self.assertEquals(len(callback.errors), 3)
+        self.assertEqual(len(callback.errors), 3)
     
     def __fault_err_callback(self, filename:str, zip_file:zipfile.ZipFile):
         raise ValueError('dummy error %s in %s' % (filename, zip_file.filename) )
@@ -71,4 +71,4 @@ class InvoiceFileReaderTest(unittest.TestCase):
         self.file_reader.read_zipped_files(True)
         self.file_reader.set_ignore_errors(True)
         self.file_reader.do_in_list(self.zip_path, callback, '**/*.zip')
-        self.assertEquals(len(callback.errors), 3)
+        self.assertEqual(len(callback.errors), 3)
