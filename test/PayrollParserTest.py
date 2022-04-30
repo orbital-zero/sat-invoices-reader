@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from classes.dto.Comprobante import CFDI, Comprobante
+from classes.dto.Comprobante import Comprobante
 from classes.parser.CustomElement import CustomElement
 from classes.parser.PayrollParser import PayrollParser
 
@@ -28,3 +28,9 @@ class PayrollParserTest(unittest.TestCase):
         self.assertIsNotNone(com.payroll)
         self.assertIsNotNone(com.concepts[0])
         
+
+    def test_read_duplicated_uuid(self):
+        with self.assertRaises(ValueError):
+            parser = PayrollParser()
+            com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
+            com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file) # raise exception

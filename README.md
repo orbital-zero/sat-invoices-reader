@@ -1,4 +1,4 @@
-![CI](https://github.com/orbital-zero/sat-invoices-reader/actions/workflows/build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/orbital-zero/sat-invoices-reader/badge.svg?branch=feature/xpath)](https://coveralls.io/github/orbital-zero/sat-invoices-reader?branch=feature/xpath)
+![CI](https://github.com/orbital-zero/sat-invoices-reader/actions/workflows/build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/orbital-zero/sat-invoices-reader/badge.svg)](https://coveralls.io/github/orbital-zero/sat-invoices-reader) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=orbital-zero_sat-invoices-reader&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=orbital-zero_sat-invoices-reader)
 
 
 # sat-invoices-reader
@@ -111,7 +111,7 @@ python -m autopep8 -i <filename>
 python -m autopep8 --select=E225,E231,E301,E302,E303,E265 <filename>
 
 # Fix issues in aggresive level 1
-python -m autopep8 --in-place --aggressive <filename>
+python -m autopep8 --in-place --aggressive --ignore=E731 <filename>
 
 # Show help
 python -m autopep8 -h

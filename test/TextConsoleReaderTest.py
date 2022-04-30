@@ -24,9 +24,16 @@ class TextConsoleReaderTest(unittest.TestCase):
         self.reader.read(self.path, 'P')
         self.assertIsNotNone(self.reader.callback_result)
 
-    def test_read_payroll_zip_invoce(self):
+    def test_read_payroll_zip_invoce_show_err(self):
         
         self.reader.file_reader.read_zipped_files(True)
+        self.reader.read(self.path, 'P')
+        self.assertIsNotNone(self.reader.callback_result)
+
+    def test_read_payroll_zip_invoce_ignore_err(self):
+        
+        self.reader.file_reader.read_zipped_files(True)
+        self.reader.file_reader.set_ignore_errors(True)
         self.reader.read(self.path, 'P')
         self.assertIsNotNone(self.reader.callback_result)
 
