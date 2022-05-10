@@ -111,3 +111,11 @@ class CustomElement(etree.ElementBase):
             return el[0] if (len(el) == 1) else el
         else:
             return None
+
+    @classmethod
+    def get_tree_parser(self) -> etree.XMLParser:
+        parser_lookup = etree.ElementDefaultClassLookup(element=CustomElement)
+        parser = etree.XMLParser(recover=True)
+        parser.set_element_class_lookup(parser_lookup)
+
+        return parser

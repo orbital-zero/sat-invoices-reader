@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import abc
-import typing
+
+from classes.reader.Callback import Callback
 
 
 class FileReaderInterface(metaclass=abc.ABCMeta):
@@ -11,6 +12,6 @@ class FileReaderInterface(metaclass=abc.ABCMeta):
         return (hasattr(subclass, 'do_in_list') and callable(subclass.do_in_list))
 
     @abc.abstractmethod
-    def do_in_list(self, path: str, _callback: typing.Any):
+    def do_in_list(self, path: str, _callback: Callback):
         """List files and execute a custom operation during looping"""
         raise NotImplementedError
