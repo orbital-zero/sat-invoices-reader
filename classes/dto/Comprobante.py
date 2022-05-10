@@ -69,10 +69,6 @@ class Payroll:
     def setPaidTax(self, _paid_tax: str):
         self._paid_tax = _paid_tax
 
-    # total_percepts: str
-    # total_deductions: str
-    # total_other: str
-
 
 class CFDI:
     _ns = {"re": "http://exslt.org/regular-expressions",

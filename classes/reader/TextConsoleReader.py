@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from typing import List
 from xml.dom import NotSupportedErr
 from classes.reader.Callback import Callback
 from classes.dto.Comprobante import Comprobante
@@ -51,7 +50,6 @@ class TextConsoleReader:
 
     def read_payroll(self, path: str):
 
-        # print headers
         print(
             'archivo',
             'xml version',
@@ -68,26 +66,15 @@ class TextConsoleReader:
             sep='|')
 
         self.callback = Callback()
-        custom_parser = CustomElement.get_tree_parser()
-        file_filter = ''
+        tree_parser = CustomElement.get_tree_parser()
 
-        if self.file_reader.is_zipped_file:
-            # read file into zip
-            fx = lambda filename, zip_file: self.__read_payroll_zip_file(
-                filename,
-                custom_parser,
-                zip_file)
+        def read_invoice(invoice: Comprobante):
+            """" custom action to read payroll invoices """
+            if invoice is not None:
+                self.__print_payroll_record(invoice)
+                self.callback.result.append(invoice.tfd.uuid)
 
-            file_filter = '**/*.zip'
-        else:
-            # read files
-            fx = lambda filename: self.__read_payroll_file(
-                filename, custom_parser)
-
-            file_filter = '**/*.xml'
-
-        self.callback.set_function(fx)
-        self._file_reader.do_in_list(path, self.callback, file_filter)
+        self.__read_invoices(path, tree_parser, self.payrollParser, read_invoice)
 
     def read_deductions(self, path: str):
 
@@ -107,47 +94,14 @@ class TextConsoleReader:
             sep='|')
 
         self.callback = Callback()
-        custom_parser = CustomElement.get_tree_parser()
-        file_filter = ''
+        tree_parser = CustomElement.get_tree_parser()
 
-        if self.file_reader.is_zipped_file:
-            # read file into zip
-            fx = lambda filename, zip_file: self.__read_deduction_zip_file(
-                filename,
-                custom_parser,
-                zip_file)
-
-            file_filter = '**/*.zip'
-
-        else:
-            # read file
-            fx = lambda filename: self.__read_deduction_file(
-                filename, custom_parser)
-
-            file_filter = '**/*.xml'
-
-        self.callback.set_function(fx)
-        self._file_reader.do_in_list(path, self.callback, file_filter)
-
-    def __read_payroll_zip_file(
-            self, filename: str, custom_parser: etree.XMLParser, zip_file: zipfile.ZipFile) -> List:
-        content = io.BytesIO(zip_file.read(filename))
-        contentDecoded = content.getvalue().decode('utf-8', 'ignore')
-        file = etree.fromstring(contentDecoded, custom_parser)
-        invoice: Comprobante = self.payrollParser.parse(filename, file)
-
-        if invoice is not None:
-            self.__print_payroll_record(invoice)
+        def read_invoice(invoice: Comprobante):
+            """" custom action to read deduction invoices """
+            self.__print_deduction_record(invoice)
             self.callback.result.append(invoice.tfd.uuid)
 
-    def __read_payroll_file(self, filename: str,
-                            custom_parser: etree.XMLParser) -> List:
-        file = etree.parse(filename, custom_parser)
-        invoice = self.payrollParser.parse(filename.name, file)
-
-        if invoice is not None:
-            self.__print_payroll_record(invoice)
-            self.callback.result.append(invoice.tfd.uuid)
+        self.__read_invoices(path, tree_parser, self.deductionParser, read_invoice)
 
     def __print_payroll_record(self, invoice: Comprobante):
         print(
@@ -165,24 +119,6 @@ class TextConsoleReader:
             invoice.total,
             sep='|')
 
-    def __read_deduction_file(self, filename: str,
-                              custom_parser: etree.XMLParser) -> List:
-        file = etree.parse(filename, custom_parser)
-        self.__print_deduction_record(
-            self.deductionParser.parse(
-                filename, file))
-        self.callback.result.append(filename)
-
-    def __read_deduction_zip_file(
-            self, filename: str, custom_parser: etree.XMLParser, zip_file: zipfile.ZipFile) -> List:
-        content = io.BytesIO(zip_file.read(filename))
-        contentDecoded = content.getvalue().decode('utf-8', 'ignore')
-        file = etree.fromstring(contentDecoded, custom_parser)
-        self.__print_deduction_record(
-            self.deductionParser.parse(
-                filename, file))
-        self.callback.result.append(filename)
-
     def __print_deduction_record(self, invoice: Comprobante):
         print(
             invoice.file_name,
@@ -195,3 +131,43 @@ class TextConsoleReader:
             invoice.subtotal,
             invoice.total,
             sep='|')
+
+    def __get_invoice_from_zip(self, file: str, tree_parser: etree.XMLParser,
+                               zip_file: zipfile.ZipFile,
+                               invoice_parser: InvoiceParserInterface) -> Comprobante:
+        """Get an invoice file from zip file, requires a parser to convert invoice"""
+
+        content = io.BytesIO(zip_file.read(file))
+        content_decoded = content.getvalue().decode('utf-8', 'ignore')
+        tree = etree.fromstring(content_decoded, tree_parser)
+        return invoice_parser.parse(file, tree)
+
+    def __get_invoice_from_file(self, file: str, tree_parser: etree.XMLParser,
+                                invoice_parser: InvoiceParserInterface) -> Comprobante:
+        """Get an invoice file from file system, requires a parser to convert invoice"""
+
+        tree = etree.parse(file, tree_parser)
+        return invoice_parser.parse(file, tree)
+
+    def __read_invoices(self, path: str, tree_parser, invoice_parser: InvoiceParserInterface, read_invoice):
+        """Read invoices from xml or zipped files passing a cusmoziable function when file is readed,
+            an invoice parser is required to convert invoice"""
+
+        if self.file_reader.is_zipped_file:
+            # read xml from zip file
+            def invoice_func(filename, zip_file):
+                invoice = self.__get_invoice_from_zip(filename, tree_parser, zip_file, invoice_parser)
+                read_invoice(invoice)
+
+            file_filter = '**/*.zip'
+
+        else:
+            # read xml from file system
+            def invoice_func(file):
+                invoice = self.__get_invoice_from_file(file, tree_parser, invoice_parser)
+                read_invoice(invoice)
+
+            file_filter = '**/*.xml'
+
+        self.callback.set_function(invoice_func)
+        self._file_reader.do_in_list(path, self.callback, file_filter)
