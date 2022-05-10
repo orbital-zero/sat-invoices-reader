@@ -2,15 +2,15 @@
 
 from typing import List
 from xml.dom import NotSupportedErr
-import zipfile
+from classes.reader.Callback import Callback
 from classes.dto.Comprobante import Comprobante
 from classes.parser.CustomElement import CustomElement
 from classes.parser.InvoiceParserInterface import InvoiceParserInterface
-from lxml import etree
-import io
-from classes.reader.Callback import Callback
-
 from classes.reader.InvoiceFileReader import InvoiceFileReader
+from lxml import etree
+
+import zipfile
+import io
 
 
 class TextConsoleReader:
@@ -68,7 +68,7 @@ class TextConsoleReader:
             sep='|')
 
         self.callback = Callback()
-        custom_parser = self.__get_tree_parser()
+        custom_parser = CustomElement.get_tree_parser()
         file_filter = ''
 
         if self.file_reader.is_zipped_file:
@@ -107,7 +107,7 @@ class TextConsoleReader:
             sep='|')
 
         self.callback = Callback()
-        custom_parser = self.__get_tree_parser()
+        custom_parser = CustomElement.get_tree_parser()
         file_filter = ''
 
         if self.file_reader.is_zipped_file:
@@ -195,10 +195,3 @@ class TextConsoleReader:
             invoice.subtotal,
             invoice.total,
             sep='|')
-
-    def __get_tree_parser(self) -> etree.XMLParser:
-        parser_lookup = etree.ElementDefaultClassLookup(element=CustomElement)
-        parser = etree.XMLParser(recover=True)
-        parser.set_element_class_lookup(parser_lookup)
-
-        return parser

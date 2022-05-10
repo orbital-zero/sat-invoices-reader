@@ -16,15 +16,9 @@ class Callback:
     def set_function(self, _function):
         self._function = _function
 
-    def get_function(self) -> typing.Any:
-        return lambda: self._function
-
     @property
     def result(self) -> list:
         return self._result
-
-    def set_result(self, _res):
-        self._result = _res
 
     @property
     def errors(self) -> list:

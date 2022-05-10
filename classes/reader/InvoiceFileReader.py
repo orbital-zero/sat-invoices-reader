@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
-import logging
 from pathlib import Path
 from classes.reader.Callback import Callback
 from classes.reader.FileReaderInterface import FileReaderInterface
 
-import typing
+import logging
 import zipfile
 
 
 class InvoiceFileReader(FileReaderInterface):
 
-    def __init__(self, _is_zipped_file: bool = False) -> None:
+    def __init__(self, _is_zipped_file: bool = False, _ignore_err: bool = False) -> None:
         self._is_zipped_file = _is_zipped_file
-        self._ignore_err = False
+        self._ignore_err = _ignore_err
 
     @property
     def ignore_errors(self) -> bool:
@@ -29,7 +28,7 @@ class InvoiceFileReader(FileReaderInterface):
     def read_zipped_files(self, read_zip: bool):
         self._is_zipped_file = read_zip
 
-    def do_in_list(self, path: str, _callback: typing.Any, filter: str):
+    def do_in_list(self, path: str, _callback: Callback, filter: str):
 
         for filename in Path(path).glob(filter):
             try:

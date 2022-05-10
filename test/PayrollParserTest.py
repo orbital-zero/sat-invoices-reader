@@ -8,29 +8,30 @@ from lxml import etree
 
 import unittest
 
+
 class PayrollParserTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        _FILE="./test/resources/payroll/one_file/dummy-invoice.xml"
+        _FILE = "./test/resources/payroll/one_file/dummy-invoice.xml"
         parser_lookup = etree.ElementDefaultClassLookup(element=CustomElement)
         parser = etree.XMLParser()
         parser.set_element_class_lookup(parser_lookup)
         cls.file: etree._ElementTree = etree.parse(_FILE, parser)
 
     def test_parse(self):
-        
+
         parser = PayrollParser()
-        com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
+        com: Comprobante = parser.parse(
+            'dummy-filename-invoice.xml', self.file)
 
         self.assertIsNotNone(com.issuer)
         self.assertEqual(com.issuer.rfc, 'ABC123456T5')
         self.assertIsNotNone(com.payroll)
         self.assertIsNotNone(com.concepts[0])
-        
 
     def test_read_duplicated_uuid(self):
         with self.assertRaises(ValueError):
             parser = PayrollParser()
-            com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
-            com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file) # raise exception
+            parser.parse('dummy-filename-invoice.xml', self.file)
+            parser.parse('dummy-filename-invoice.xml', self.file)  # raise exception
