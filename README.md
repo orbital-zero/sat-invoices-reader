@@ -52,7 +52,7 @@ These are an examples to execute the command:
 
 $ classify.py -h
 
-usage: classify.py [-h] -p source_path -o target_path [-z]
+usage: classify.py [-h] -p source_path -o target_path [-x]
 
 Classify invoices by issuer and year of creation
 
@@ -70,7 +70,7 @@ These are an examples to execute the command:
         ./classify.py -p <sourcesPath> -o <targetPath>
 
     # extract and sort xml zipped files from a directory
-        ./classify.py -p <sourcesPath> -o <targetPath> -z
+        ./classify.py -p <sourcesPath> -o <targetPath> -x
 
 ```
 

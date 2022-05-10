@@ -84,8 +84,8 @@ class InvoiceClassifier:
                                    parser: etree.XMLParser, target: str):
 
         content = io.BytesIO(zip_file.read(file))
-        contentDecoded = content.getvalue().decode('utf-8', 'ignore')
-        tree = etree.fromstring(contentDecoded, parser)
+        content_decoded = content.getvalue().decode('utf-8', 'ignore')
+        tree = etree.fromstring(content_decoded, parser)
         invoice: Comprobante = self.invoice_parser.parse(file, tree)
 
         output_path = self.__get_ouput_path(invoice, target)
