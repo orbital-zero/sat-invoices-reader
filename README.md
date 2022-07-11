@@ -159,5 +159,5 @@ See also **autopep8** docs [here](https://pypi.org/project/autopep8/) to get mor
 To make a distributable binary package a python interpreter must be installed, this project use the **Eel** and **PyInstaller**:
 
  1. Install packages: `python -m pip install PyInstaller`
- 2. Run `python -m eel gui.py gui/web --onefile --noconsole`
+ 2. Run `python -m eel gui.py web --onefile --noconsole`
  3. The folder dist/ will be created with the binary package
