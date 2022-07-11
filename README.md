@@ -18,7 +18,7 @@ python -m pip install lxml pyyaml coverage coveralls autopep8 eel eel[jinja2] Py
 
 The application canbe used in the terminal or with a gui web app.
 
-To start grafic user interface:
+To start graphic user interface:
 
 ```sh
 python gui.py

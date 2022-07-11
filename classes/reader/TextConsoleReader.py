@@ -4,7 +4,8 @@ from classes.reader.CSVReader import CSVReader
 
 import logging
 
-logger = logging.getLogger(__name__)  
+logger = logging.getLogger(__name__)
+
 
 class TextConsoleReader:
 
@@ -14,7 +15,7 @@ class TextConsoleReader:
     @property
     def reader(self) -> CSVReader:
         return self._reader
-    
+
     def set_reader(self, _reader: CSVReader):
         self._reader = _reader
 
@@ -27,7 +28,7 @@ class TextConsoleReader:
         self.reader.read(path, _type)
         self.__print_csv_content(self.reader.callback_result)
 
-        if(self.reader.callback.errors is not None and len(self.reader.callback.errors)>=1):
+        if(self.reader.callback.errors is not None and len(self.reader.callback.errors) >= 1):
             print("----------------------------")
             print("List of errors and warnings:")
             self.__print_errors(self.reader.callback.errors)
