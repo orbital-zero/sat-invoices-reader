@@ -4,6 +4,7 @@ import sys
 import argparse
 from classes.parser.DeductionsParser import DeductionsParser
 from classes.parser.PayrollParser import PayrollParser
+from classes.reader.CSVReader import CSVReader
 from classes.reader.InvoiceFileReader import InvoiceFileReader
 from classes.reader.TextConsoleReader import TextConsoleReader
 
@@ -36,15 +37,16 @@ def main(argv):
 
     args = parser.parse_args()
 
-    reader = TextConsoleReader()
+    reader = CSVReader()
     reader.setDeductuctionParser(DeductionsParser())
     reader.setPayrollParser(PayrollParser())
     reader.setFileReader(InvoiceFileReader())
 
     if(args.extract):
         reader.file_reader.read_zipped_files(True)
-
-    reader.read(args.sourcesPath, args.type)
+    
+    console = TextConsoleReader(reader)    
+    console.read(args.sourcesPath, args.type)
 
 
 if __name__ == "__main__":

@@ -10,21 +10,21 @@ from pathlib import Path
 import zipfile
 import unittest
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('testLogger')
+#logger = logging.getLogger(__name__)
 
 
 class InvoiceFileReaderTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        logging.config.fileConfig(fname='./test/logger-tests.conf', disable_existing_loggers=False)
         cls.file_reader = InvoiceFileReader()
         cls.zip_path = str(Path(__file__).parent) + \
             "/resources/payroll/zip_file"
         cls.one_file = str(Path(__file__).parent) + \
             "/resources/payroll/one_file"
-        logging.config.fileConfig(
-            fname='./test/logger-tests.conf',
-            disable_existing_loggers=False)
+        
 
     def test_list_xml_files(self):
 

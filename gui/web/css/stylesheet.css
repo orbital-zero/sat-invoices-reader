@@ -1,0 +1,44 @@
+/*
+When creating your CSS selector,
+change "brown" to something of your choosing
+*/
+.waves-effect.waves-blue .waves-ripple {
+/* The alpha value allows the text and background color
+of the button to still show through. */
+    background-color: #0091ea;
+
+}
+
+textarea.materialize-textarea.result_a1 {
+    max-height: 180px;
+    min-height: 180px;
+}
+
+textarea.materialize-textarea.result_a2 {
+    max-height: 120px;
+    min-height: 120px;
+}
+
+textarea.inline-output-text{
+    font-size: 9pt;
+    white-space: pre;
+    overflow: auto;
+    resize: none;
+    height: 200px;
+    min-height: 250px;
+    max-height: 250px;
+}
+
+div.inline-output-text{
+    overflow: auto;
+    white-space: nowrap;
+    resize: none;
+}
+
+#btn_sort_output, #btn_sort_input{
+    min-width: 115px;
+}
+
+.about-card-text p{
+    text-align: justify;
+}

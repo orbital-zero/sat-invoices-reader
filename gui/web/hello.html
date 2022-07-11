@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello, World!</title>
+        
+        <link href="css/stylesheet.css" rel="stylesheet"/>
+        <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
+        <script type="text/javascript" src="/eel.js"></script>
+        <script type="text/javascript" src="js/functions.js"></script>
+        
+        <!-- Material design -->
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+        
+        <script type="text/javascript">
+            
+        say_hello_js("Javascript World!");
+        eel.say_hello_py("Javascript World!");  // Call a Python function
+        mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
+        
+        </script>
+    </head>
+    
+    <body>
+        Hello, World!
+
+
+        <button class="mdc-button foo-button">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Button</span>
+          </button>
+    </body>
+</html>

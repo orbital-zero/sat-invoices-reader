@@ -9,3 +9,6 @@ lcov.info
 .pytest_cache
 .coverage
 target
+dist
+examples
+build

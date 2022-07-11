@@ -7,6 +7,8 @@ from classes.reader.FileReaderInterface import FileReaderInterface
 import logging
 import zipfile
 
+logger = logging.getLogger(__name__)
+
 
 class InvoiceFileReader(FileReaderInterface):
 
@@ -39,7 +41,7 @@ class InvoiceFileReader(FileReaderInterface):
             except Exception as e:
                 _callback.errors.append(e)
                 if not self.ignore_errors:
-                    logging.exception(
+                    logger.error(
                         'Error with file {0} , skipping...'.format(filename))
                 continue
 
@@ -55,6 +57,6 @@ class InvoiceFileReader(FileReaderInterface):
             except Exception as e:
                 _callback.errors.append(e)
                 if not self.ignore_errors:
-                    logging.exception(
+                    logger.error(
                         'Error with file {0} , skipping...'.format(filename))
                 continue

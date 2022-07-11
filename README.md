@@ -11,12 +11,20 @@ Sat invoices reader, the ones used in Mexico
 Additional packages:
 
 ```bash
-python -m pip install lxml pyyaml coverage coveralls autopep8
+python -m pip install lxml pyyaml coverage coveralls autopep8 eel eel[jinja2] PyInstaller
 ```
 
 ## Description
 
-There are two scripts:
+The application canbe used in the terminal or with a gui web app.
+
+To start grafic user interface:
+
+```sh
+python gui.py
+```
+
+In terminal, there are two scripts:
 
 - `main.py` to read payroll and deduction invoices
 - `classify.py` to sort invoices by issuer and their year of creation
@@ -119,7 +127,7 @@ python -m flake8 path/to/sources --count --exit-zero --max-complexity=10 --max-l
 python -m flake8 path/to/file.py --count --show-source  --statistics
 
 ```
-For more deteil of errors and violations, see here [violation codes](https://flake8.pycqa.org/en/latest/user/error-codes.html) and [error codes](https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes)
+For more detail read [violation codes](https://flake8.pycqa.org/en/latest/user/error-codes.html) and [error codes](https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes)
 
 ## Format code to conform style guide
 
@@ -144,4 +152,14 @@ python -m autopep8 -h
 ```
 
 See also **autopep8** docs [here](https://pypi.org/project/autopep8/) to get more detailed instructions and error codes description.
-    
+
+
+# Build
+
+## Make a distribution package
+
+To make a distributable binary package a python interpreter must be installed, this project use the **Eel** and **PyInstaller**:
+
+ 1. Install packages: `python -m pip install PyInstaller`
+ 2. Run `python -m eel gui.py gui/web --onefile --noconsole`
+ 3. The folder dist/ willbe created with the binary package
