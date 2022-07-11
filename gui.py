@@ -14,7 +14,7 @@ from classes.parser.GeneralInvoiceParser import GeneralInvoiceParser
 logger = logging.getLogger(__name__)  
 
 # Set web files folder
-eel.init('gui/web')
+eel.init('web')
 
 @eel.expose                         # Expose this function to Javascript
 def say_hello_py(x):

@@ -11,14 +11,12 @@ Sat invoices reader, the ones used in Mexico
 Additional packages:
 
 ```bash
-python -m pip install lxml pyyaml coverage coveralls autopep8 eel eel[jinja2] PyInstaller
+python -m pip install lxml pyyaml coverage coveralls flake8 autopep8 eel eel[jinja2] PyInstaller
 ```
 
 ## Description
 
-The application canbe used in the terminal or with a gui web app.
-
-To start graphic user interface:
+The application can be used in the terminal or with a gui as web app. To start graphic user interface:
 
 ```sh
 python gui.py
@@ -27,7 +25,7 @@ python gui.py
 In terminal, there are two scripts:
 
 - `main.py` to read payroll and deduction invoices
-- `classify.py` to sort invoices by issuer and their year of creation
+- `classify.py` to sort invoices by the year of creation and their issuer
 
 Use option -h for get help of each one.
 
@@ -151,15 +149,15 @@ python -m autopep8 -h
 
 ```
 
-See also **autopep8** docs [here](https://pypi.org/project/autopep8/) to get more detailed instructions and error codes description.
+See also **autopep8** docs [here](https://pypi.org/project/autopep8/) to get more detailed instructions and description of error codes.
 
 
-# Build
+## Build
 
-## Make a distribution package
+### Make a distribution package
 
 To make a distributable binary package a python interpreter must be installed, this project use the **Eel** and **PyInstaller**:
 
  1. Install packages: `python -m pip install PyInstaller`
  2. Run `python -m eel gui.py gui/web --onefile --noconsole`
- 3. The folder dist/ willbe created with the binary package
+ 3. The folder dist/ will be created with the binary package

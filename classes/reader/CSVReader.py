@@ -132,7 +132,7 @@ class CSVReader:
                                 invoice_parser: InvoiceParserInterface) -> Comprobante:
         """Get an invoice file from file system, requires a parser to convert invoice"""
 
-        tree = etree.parse(file, tree_parser)
+        tree = etree.parse(str(file), tree_parser)
         return invoice_parser.parse(str(file), tree)
 
     def __read_invoices(self, path: str, tree_parser,

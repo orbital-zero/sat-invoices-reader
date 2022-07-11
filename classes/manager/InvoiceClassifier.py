@@ -67,7 +67,7 @@ class InvoiceClassifier:
 
     def __classify_invoices(self, file: Path, parser: etree.XMLParser, target: str):
 
-        tree: ElementTree = etree.parse(file, parser)
+        tree: ElementTree = etree.parse(str(file), parser)
         invoice: Comprobante = self.invoice_parser.parse(file.name, tree)
 
         output_path = self.__get_ouput_path(invoice, target)
