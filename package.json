@@ -1,0 +1,14 @@
+{
+  "name": "invoice-reader",
+  "version": "1.0.0",
+  "description": "SAT invoice file reader",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jaehoo",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^19.0.8"
+  }
+}

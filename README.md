@@ -2,11 +2,17 @@
 
 
 # sat-invoices-reader
-Sat invoices reader, the ones used in Mexico
+Sat invoices reader, the ones used in Mexico. This project can be used to read the content from xml invoces files and export to CSV file to analyze finantial data.
+
+<div align="center">
+    <img src="images/screenshot.png" alt="OpenCore Patcher Logo" width="400" />
+</div>
 
 ## Requirements
 
 - python > 3.X
+- electron > 19.X
+- nodejs > 16.X
 
 Additional packages:
 
@@ -29,7 +35,7 @@ In terminal, there are two scripts:
 
 Use option -h for get help of each one.
 
-output:
+
 ```
 $ main.py -h
 
@@ -160,4 +166,4 @@ To make a distributable binary package a python interpreter must be installed, t
 
  1. Install packages: `python -m pip install PyInstaller`
  2. Run `python -m eel gui.py web --onefile --noconsole`
- 3. The folder dist/ will be created with the binary package
+ 3. The folder `dist/` will be created with the binary package

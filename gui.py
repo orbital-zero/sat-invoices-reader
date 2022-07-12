@@ -112,8 +112,8 @@ def classify_invoices(source, target, zip:bool):
 
 
 
-eel.start('index.html',size=(800, 600), mode='app')
-#eel.start('index.html',size=(800, 600), mode='electron')
+#eel.start('index.html',size=(800, 600), mode='app')
+eel.start('index.html',size=(800, 600), mode='electron')
 
 #options = { 'mode': 'electron', 'args': ['electron', 'gui'] }
 #eel.start('index.html',size=(800, 600),  options=options, suppress_error=True)
