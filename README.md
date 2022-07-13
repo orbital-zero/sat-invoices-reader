@@ -2,7 +2,11 @@
 
 
 # sat-invoices-reader
-Sat invoices reader, the ones used in Mexico
+Sat invoices reader, the ones used in Mexico. This project can be used to read the content from xml invoces files and export to CSV file to analyze finantial data.
+
+<div align="center">
+    <img src="images/screenshot.png" alt="OpenCore Patcher Logo" width="400" />
+</div>
 
 ## Requirements
 
@@ -11,7 +15,7 @@ Sat invoices reader, the ones used in Mexico
 Additional packages:
 
 ```bash
-python -m pip install lxml pyyaml coverage coveralls flake8 autopep8 eel eel[jinja2] PyInstaller
+python -m pip install lxml pyyaml coverage coveralls flake8 autopep8 eel eel[jinja2] PyInstaller pywebview qtpy PyQt5 PyQtWebEngine
 ```
 
 ## Description

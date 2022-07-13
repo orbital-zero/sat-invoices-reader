@@ -1,5 +1,6 @@
 import eel, os, random
 import logging
+import webview, threading
 
 from tkinter import filedialog
 from tkinter import *
@@ -111,11 +112,24 @@ def classify_invoices(source, target, zip:bool):
     return data
 
 
+def start_app():
+    eel_thread = threading.Thread(target=eel_start) # Eel app start.
+    eel_thread.daemon = True
+    eel_thread.start() # Run eel in a seperate thread.
 
-eel.start('index.html',size=(800, 600), mode='app')
-#eel.start('index.html',size=(800, 600), mode='electron')
+    webview_start() # Start pywebview web browser.
 
-#options = { 'mode': 'electron', 'args': ['electron', 'gui'] }
-#eel.start('index.html',size=(800, 600),  options=options, suppress_error=True)
+def eel_start():
+    # EEL app start.
+    eel.init('web')
+    eel.start('file_access.html', size=(800, 600), mode=None)
 
+def webview_start():
+    # pywebview start.
+    # https://pywebview.flowrl.com/guide/api.html#webview-create-window
+    webview.create_window('SAT Invoice Reader',
+     'http://localhost:8000/index.html',
+     frameless=True)
+    webview.start(gui='qt')
 
+start_app()

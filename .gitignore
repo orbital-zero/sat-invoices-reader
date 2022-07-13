@@ -12,3 +12,4 @@ target
 dist
 examples
 build
+*.spec
