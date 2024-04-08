@@ -139,7 +139,13 @@ class TextConsoleReader:
 
         content = io.BytesIO(zip_file.read(file))
         content_decoded = content.getvalue().decode('utf-8', 'ignore')
-        tree = etree.fromstring(content_decoded, tree_parser)
+
+        if content_decoded.startswith('<?xml'):
+            content_without_declaration = content_decoded.split('\n', 1)[1]
+        else:
+            content_without_declaration = content_decoded
+
+        tree = etree.fromstring(content_without_declaration, tree_parser)
         return invoice_parser.parse(file, tree)
 
     def __get_invoice_from_file(self, file: str, tree_parser: etree.XMLParser,
