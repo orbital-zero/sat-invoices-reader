@@ -2,7 +2,7 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 # To   setup env variables see: https://docs.github.com/es/actions/learn-github-actions/environment-variables
 
-name: Python package
+name: SAT Invoice reader package
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -52,24 +52,29 @@ jobs:
           python -m coverage xml -o ./coverage/coverage.xml
         #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
         # python -m coverage run --source=classes -m pytest test
-      - name: Coveralls Scan
+      - name: Analyze with Coveralls
         if: ${{ success() }}
         uses: coverallsapp/github-action@v2.2.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           git-branch: ${{ github.ref }}
           flag-name: Unit
-      - name: SonarCloud Scan
+      - name: Analyze with SonarCloud
         if: ${{ steps.tests.conclusion == 'success' }}
         # You may pin to the exact commit or the version.
         # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
         # https://github.com/marketplace/actions/sonarcloud-scan
         uses: SonarSource/sonarcloud-github-action@v2.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
         with:
           # Set the sonar.projectBaseDir analysis property
           projectBaseDir: .
           # Additional arguments to the sonarcloud scanner
-          args: >
+          args: 
+            # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
+            # mandatory
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
             -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml
@@ -79,6 +84,5 @@ jobs:
             -Dsonar.python.version=3.8
         #  -Dsonar.test.exclusions=tests/**
         #  -Dsonar.verbose=true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #  -Dsonar.organization=${{ secrets.SONAR_ORG }}
+        #  -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
