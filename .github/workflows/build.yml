@@ -52,8 +52,8 @@ jobs:
           python -m coverage xml -o ./coverage/coverage.xml
         #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
         # python -m coverage run --source=classes -m pytest test
-      - name: Archive workspace
-        uses: actions/upload-artifact@v2
+      - name: Upload artifact
+        uses: echapmanFromBunnings/upload-artifact@3.0.0
         with:
           name: workspace-output
           path: |
@@ -69,6 +69,8 @@ jobs:
     steps:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v4
+      with:
+        name: workspace-output
     - name: Analyze with Coveralls
       if: ${{ success() }}
       uses: coverallsapp/github-action@v2.2.3
