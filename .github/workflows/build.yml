@@ -70,7 +70,9 @@ jobs:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v4
       with:
-        name: workspace-output
+        path: .
+    - name: Display structure of downloaded files
+      run: ls -R
     - name: Analyze with Coveralls
       if: ${{ success() }}
       uses: coverallsapp/github-action@v2.2.3
