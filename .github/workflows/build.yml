@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-
+    name: Build stage
     if: ${{ github.event.pull_request.merged == true || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     strategy:
@@ -31,6 +31,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -52,37 +58,43 @@ jobs:
           python -m coverage xml -o ./coverage/coverage.xml
         #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
         # python -m coverage run --source=classes -m pytest test
-      - name: Analyze with Coveralls
-        if: ${{ success() }}
-        uses: coverallsapp/github-action@v2.2.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          git-branch: ${{ github.ref }}
-          flag-name: Unit
-      - name: Analyze with SonarCloud
-        if: ${{ steps.tests.conclusion == 'success' }}
-        # You may pin to the exact commit or the version.
-        # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
-        # https://github.com/marketplace/actions/sonarcloud-scan
-        uses: SonarSource/sonarcloud-github-action@v2.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
-        with:
-          # Set the sonar.projectBaseDir analysis property
-          projectBaseDir: .
-          # Additional arguments to the sonarcloud scanner
-          args: 
-            # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
-            # mandatory
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
-            -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml
-            -Dsonar.tests=test/
-            -Dsonar.sources=classes/
-            -Dsonar.python.flake8.reportPaths=./coverage/flake-report.txt
-            -Dsonar.python.version=3.8
-        #  -Dsonar.test.exclusions=tests/**
-        #  -Dsonar.verbose=true
-        #  -Dsonar.organization=${{ secrets.SONAR_ORG }}
-        #  -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
+  
+  inspection:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Analyze with Coveralls
+      if: ${{ success() }}
+      uses: coverallsapp/github-action@v2.2.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        git-branch: ${{ github.ref }}
+        flag-name: Unit
+    - name: Analyze with SonarCloud
+      #if: ${{ steps.tests.conclusion == 'success' }}
+      if: ${{ success() }}
+      # You may pin to the exact commit or the version.
+      # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
+      # https://github.com/marketplace/actions/sonarcloud-scan
+      uses: SonarSource/sonarcloud-github-action@v2.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
+      with:
+        # Set the sonar.projectBaseDir analysis property
+        projectBaseDir: .
+        # Additional arguments to the sonarcloud scanner
+        args: 
+          # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
+          # mandatory
+          -Dsonar.organization=${{ secrets.SONAR_ORG }}
+          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
+          -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml
+          -Dsonar.tests=test/
+          -Dsonar.sources=classes/
+          -Dsonar.python.flake8.reportPaths=./coverage/flake-report.txt
+          -Dsonar.python.version=3.8
+      #  -Dsonar.test.exclusions=tests/**
+      #  -Dsonar.verbose=true
+      #  -Dsonar.organization=${{ secrets.SONAR_ORG }}
+      #  -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
