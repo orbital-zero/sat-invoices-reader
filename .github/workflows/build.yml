@@ -52,15 +52,16 @@ jobs:
           python -m coverage xml -o ./coverage/coverage.xml
         #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
         # python -m coverage run --source=classes -m pytest test
-      - name: Upload artifact
-        uses: echapmanFromBunnings/upload-artifact@3.0.0
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: workspace-output
           path: |
             coverage/
             classes/
             test/
-          retention-days: 1    
+          retention-days: 1 
+          overwrite: true   
 
   coverage:
     name: Code inspection
@@ -70,6 +71,7 @@ jobs:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v4
       with:
+        name: workspace-output
         path: .
     - name: Display structure of downloaded files
       run: ls -R
