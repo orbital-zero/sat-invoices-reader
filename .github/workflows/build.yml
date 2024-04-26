@@ -96,9 +96,7 @@ jobs:
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: .
         # Additional arguments to the sonarcloud scanner
-        args: 
-          # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
-          # mandatory
+        args: >
           -Dsonar.organization=${{ secrets.SONAR_ORG }}
           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
           -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml

@@ -2,17 +2,45 @@
 
 from typing import List
 from xml.dom import NotSupportedErr
-import zipfile
 from classes.dto.Comprobante import Comprobante
 from classes.parser.CustomElement import CustomElement
 from classes.parser.InvoiceParserInterface import InvoiceParserInterface
-from lxml import etree
-import io
-
+from classes.dto.InvoiceType import InvoiceType
 from classes.reader.InvoiceFileReader import InvoiceFileReader
+from lxml import etree
+
+import zipfile
+import io
+import typing
 
 
 class TextConsoleReader:
+
+    __PAYROLL_HEADER = ['archivo',
+            'xml version',
+            'cfdiUuid',
+            'fecha',
+            'descripcion',
+            'fechainicialpago',
+            'fechafinalpago',
+            'nombre emisor',
+            'rfc emisor',
+            'totalGravado',
+            'impuestoRetenido',
+            'saldoNeto']
+    
+    __DEDUCTION_HEADER = ['archivo',
+            'xml version',
+            'cfdiUuid',
+            'fecha',
+            'descripcion',
+            'fechainicialpago',
+            'fechafinalpago',
+            'nombre emisor',
+            'rfc emisor',
+            'totalGravado',
+            'impuestoRetenido',
+            'saldoNeto']
 
     @property
     def deductionParser(self) -> InvoiceParserInterface:
@@ -41,100 +69,81 @@ class TextConsoleReader:
 
     def read(self, path: str, _type: str):
 
-        if _type == 'D':
-            self.read_deductions(path)
-        elif _type == 'P':
-            self.read_payroll(path)
+        invoice_type = InvoiceType(_type)
+        
+        if invoice_type is InvoiceType.DEDUCTION:
+            self.read_invoices(path, self.__DEDUCTION_HEADER, self.deductionParser, self.__print_deduction_record)
+            #self.read_deductions(path)
+        elif invoice_type == InvoiceType.PAYROLL:
+            #self.read_payroll(path)
+            self.read_invoices(path, self.__PAYROLL_HEADER, self.payrollParser, self.__print_payroll_record)
         else:
             raise NotSupportedErr('Invoce type not supported %(name)s' % _type)
 
-    def read_payroll(self, path: str):
-
-        # print headers
-        print(
-            'archivo',
-            'xml version',
-            'cfdiUuid',
-            'fecha',
-            'descripcion',
-            'fechainicialpago',
-            'fechafinalpago',
-            'nombre emisor',
-            'rfc emisor',
-            'totalGravado',
-            'impuestoRetenido',
-            'saldoNeto',
-            sep='|')
-
+    def read_invoices(self, path: str
+                      , _headers: List
+                      , invoice_parser: InvoiceParserInterface
+                      , print_record: typing.Callable):
+        
+        print(*_headers, sep='|')
+        
         callback = None
         self._calback_res = []
-        custom_parser = self.__get_tree_parser()
+        xpath_parser = self.__get_tree_parser()
 
         if self.file_reader.is_zipped_file:
-            # read file into zip
-            callback = lambda filename, zip_file: self.__read_payroll_zip_file(
+            # read invoices from zipped file
+            callback = lambda filename, zip_file: self.__get_invoice_from_zip(
                 filename,
-                custom_parser,
-                zip_file)
+                xpath_parser,
+                zip_file,
+                invoice_parser,
+                print_record)
+
         else:
-            # read file
-            callback = lambda filename: self.__read_payroll_file(filename, custom_parser)
+            # read invoices from file system
+            callback = lambda filename: self.__get_invoice_from_file(
+                filename,
+                xpath_parser,
+                invoice_parser,
+                print_record)
 
         self._file_reader.do_in_list(path, callback)
 
-    def read_deductions(self, path: str):
-
-        print(
-            'archivo',
-            'xml version',
-            'cfdiUuid',
-            'fecha',
-            'descripcion',
-            'fechainicialpago',
-            'fechafinalpago',
-            'nombre emisor',
-            'rfc emisor',
-            'totalGravado',
-            'impuestoRetenido',
-            'saldoNeto',
-            sep='|')
-
-        callback = None
-        self._calback_res = []
-        custom_parser = self.__get_tree_parser()
-
-        if self.file_reader.is_zipped_file:
-            # read file into zip
-            callback = lambda filename, zip_file: self.__read_deduction_zip_file(
-                filename,
-                custom_parser,
-                zip_file)
-        else:
-            # read file
-            callback = lambda filename: self.__read_deduction_file(filename, custom_parser)
-
-        self._file_reader.do_in_list(path, callback)
-
-    def __read_payroll_zip_file(
-            self, filename: str, custom_parser: etree.XMLParser, zip_file: zipfile.ZipFile) -> List:
+    def __get_invoice_from_zip(self, filename: str
+                        , custom_parser: etree.XMLParser
+                        , zip_file: zipfile.ZipFile
+                        , invoice_parser: InvoiceParserInterface
+                        , print_record: typing.Callable) -> List:
+        
         content = io.BytesIO(zip_file.read(filename))
-        contentDecoded = content.getvalue().decode('utf-8', 'ignore')
-        file = etree.fromstring(contentDecoded, custom_parser)
-        invoice = self.payrollParser.parse(filename, file)
+        content_decoded = content.getvalue().decode('utf-8', 'ignore')
+        
+        if content_decoded.startswith('<?xml'):
+            content_without_declaration = content_decoded.split('\n', 1)[1]
+        else:
+            content_without_declaration = content_decoded
 
+        file = etree.fromstring(content_without_declaration, custom_parser)
+        invoice = invoice_parser.parse(filename, file)
+        
         if invoice is not None:
-            self.__print_payroll_record(invoice)
+            print_record(invoice)
             self.callback_result.append(filename)
 
-    def __read_payroll_file(self, filename: str,
-                            custom_parser: etree.XMLParser) -> List:
-#        file.attrib['{{{pre}}}schemaLocation'.format(pre='http://www.host.org/2001/XMLSchema-instance')]
+   
+    def __get_invoice_from_file(self, filename: str
+                     , custom_parser: etree.XMLParser
+                     , invoice_parser: InvoiceParserInterface
+                     , print_record: typing.Callable) -> List:
+        
         file = etree.parse(filename, custom_parser)
-        invoice = self.payrollParser.parse(filename.name, file)
+        invoice = invoice_parser.parse(filename, file)
 
         if invoice is not None:
-            self.__print_payroll_record(invoice)
-            self.callback_result.append(filename.name)
+            print_record(invoice)
+            self.callback_result.append(filename)
+
 
     def __print_payroll_record(self, invoice: Comprobante):
         print(
@@ -152,21 +161,6 @@ class TextConsoleReader:
             invoice.total,
             sep='|')
 
-    def __read_deduction_file(self, filename: str,
-                              custom_parser: etree.XMLParser) -> List:
-        file = etree.parse(filename, custom_parser)
-        self.__print_deduction_record(
-            self.deductionParser.parse(
-                filename, file))
-        self.callback_result.append(filename)
-
-    def __read_deduction_zip_file(
-            self, filename: str, custom_parser: etree.XMLParser, zip_file: zipfile.ZipFile) -> List:
-        content = io.BytesIO(zip_file.read(filename))
-        contentDecoded = content.getvalue().decode('utf-8', 'ignore')
-        file = etree.fromstring(contentDecoded, custom_parser)
-        self.__print_deduction_record(self.payrollParser.parse(filename, file))
-        self.callback_result.append(filename)
 
     def __print_deduction_record(self, invoice: Comprobante):
         print(
