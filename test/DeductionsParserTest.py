@@ -8,6 +8,7 @@ from lxml import etree
 
 import unittest
 
+
 class DeductionsParserTest(unittest.TestCase):
 
     @classmethod
@@ -19,12 +20,11 @@ class DeductionsParserTest(unittest.TestCase):
         cls.file: etree._ElementTree = etree.parse(_FILE, parser)
 
     def test_parse(self):
-        
+
         parser = DeductionsParser()
-        com : Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
+        com: Comprobante = parser.parse('dummy-filename-invoice.xml', self.file)
 
         self.assertIsNotNone(com.issuer)
-        self.assertEquals(com.issuer.rfc, 'ABC123456T5')
+        self.assertEqual(com.issuer.rfc, 'ABC123456T5')
         self.assertIsNotNone(com.concepts[0])
-        self.assertEquals(com.total, '1000.0')
-        
+        self.assertEqual(com.total, '1000.0')

@@ -68,10 +68,10 @@ class CustomElementTest(unittest.TestCase):
 
         for p in paths:
             el = tree.findall(p, self._ns)
-            self.assertEquals(3, len(el))
+            self.assertEqual(3, len(el))
 
         # empty
-        self.assertEquals(
+        self.assertEqual(
             0, len(
                 tree.findall(
                     './cfdi:dummy/{*}:dummies', self._ns)))
@@ -83,7 +83,7 @@ class CustomElementTest(unittest.TestCase):
 
         self.assertIsInstance(root, CustomElement)
         self.assertEqual(root.tag, self._tagRoot)
-        self.assertEquals(len(root.attrib), 16)
+        self.assertEqual(len(root.attrib), 16)
 
         # case sensitive
         # not support absolute paths (start with '/' or '//')
@@ -134,10 +134,10 @@ class CustomElementTest(unittest.TestCase):
 
         for p in paths:
             el = root.findall(p)  # namespaces setted at root level
-            self.assertEquals(3, len(el))
+            self.assertEqual(3, len(el))
 
         # empty
-        self.assertEquals(0, len(root.findall('./cfdi:dummy/{*}:dummies')))
+        self.assertEqual(0, len(root.findall('./cfdi:dummy/{*}:dummies')))
 
     def test_element_get_attr(self):
 
@@ -145,20 +145,20 @@ class CustomElementTest(unittest.TestCase):
         self.assertTrue(isinstance(el, CustomElement))
         self.assertIsNone(el.get('formapagox'))
         self.assertIsNotNone(el.get('fOrMaPago'))
-        self.assertEquals(el.get('formapago'), '99')
+        self.assertEqual(el.get('formapago'), '99')
 
     def test_element_set_attr(self):
 
         el: etree.ElementBase = self.file.getroot()
         self.assertTrue(isinstance(el, CustomElement))
 
-        self.assertEquals(el.get('formaPago'), '99')
+        self.assertEqual(el.get('formaPago'), '99')
 
         el.set('FormaPago', '000')
-        self.assertEquals(el.get('formapago'), '000')
+        self.assertEqual(el.get('formapago'), '000')
 
         el.set('newProperty', 'AbC')
-        self.assertEquals(el.get('newproperty'), 'AbC')
+        self.assertEqual(el.get('newproperty'), 'AbC')
 
     def test_get_element(self):
 
@@ -169,23 +169,22 @@ class CustomElementTest(unittest.TestCase):
 
         # /*[re:test(local-name(), '^complemento$','i')]/*[re:test(local-name(), '^nomina$','i')]
         emisor = el.getElement('cfdi:emisor')
-        self.assertEquals(0, len(emisor))
+        self.assertEqual(0, len(emisor))
 
         emisor = el.getElement('emisorX/dummy')
-        self.assertEquals(0, len(emisor))
+        self.assertEqual(0, len(emisor))
 
         conceptos = el.getElement('conceptos/concepto')
-        self.assertEquals(2, len(conceptos))
+        self.assertEqual(2, len(conceptos))
 
         percepciones = el.getElement(
             'comPlemento/nOMiNa/Percepciones/percepcion')
-        self.assertEquals(3, len(percepciones))
+        self.assertEqual(3, len(percepciones))
 
         nom = el.getElement('complemento/nomina')
-        # print(nom)
+        self.assertIsNotNone(nom.get('FechaFinalPago'))
 
-    
-    @unittest.skip
+    #@unittest.skip
     def test_regex_nested_paths(self):
 
         valid_paths = {
@@ -282,7 +281,7 @@ class CustomElementTest(unittest.TestCase):
         conceptos = el.xpath(
             "./*[re:test(local-name(), '^conceptos$' ,'i')]/*[re:test(local-name(), '^concepto$' ,'i')]",
             namespaces=self._ns)
-        self.assertEquals(2, len(conceptos))
+        self.assertEqual(2, len(conceptos))
 
     def test_tree_xpath(self):
 
@@ -320,13 +319,13 @@ class CustomElementTest(unittest.TestCase):
         conceptos = el.xpath(
             "./*[re:test(local-name(), '^conceptos$' ,'i')]/*[re:test(local-name(), '^concepto$' ,'i')]",
             namespaces=self._ns)
-        self.assertEquals(2, len(conceptos))
+        self.assertEqual(2, len(conceptos))
 
     def test_invalid_file(self):
 
         _FILE = "./test/resources/others/invalid-invoice.xml"
         parser_lookup = etree.ElementDefaultClassLookup(element=CustomElement)
-        parser = etree.XMLParser(dtd_validation= False, recover= True)
+        parser = etree.XMLParser(dtd_validation=False, recover=True)
         parser.set_element_class_lookup(parser_lookup)
         file: etree._ElementTree = etree.parse(_FILE, parser)
         self.assertIsNotNone(file)

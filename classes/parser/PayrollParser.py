@@ -8,6 +8,16 @@ from lxml.etree import _ElementTree as ET
 
 class PayrollParser(InvoiceParserInterface):
 
+    def __init__(self) -> None:
+        self._readed_invoices = []
+
+    @property
+    def readed_invoices(self) -> list:
+        return self._readed_invoices
+
+    def clean_readed_invoices(self):
+        self._readed_invoices = []
+
     def parse(self, file_name, file: ET) -> Comprobante:
 
         cfdi = Comprobante()
@@ -16,9 +26,19 @@ class PayrollParser(InvoiceParserInterface):
         root.setNamespaces(cfdi._ns)
 
         _type = root.get('tipodecomprobante')
-
-        if( _type is not None and _type != 'N'):
+        if(_type is not None and _type != 'N'):
             return
+
+        _tfd = root.getElement('complemento/timbrefiscaldigital')
+        if _tfd is not None:
+            uuid = _tfd.get('uuid')
+            if uuid in self.readed_invoices:
+                raise ValueError(
+                    "duplicated uuid %s in %s" %
+                    (uuid, file_name))
+            else:
+                self.readed_invoices.append(uuid)
+                cfdi.setTfd(TimbreFiscalDigital(uuid))
 
         cfdi.setFilename(file_name)
         cfdi.setType(_type)
@@ -26,10 +46,6 @@ class PayrollParser(InvoiceParserInterface):
         cfdi.setDate(root.get('fecha'))
         cfdi.setSubtotal(root.get('subtotal'))
         cfdi.setTotal(root.get('total'))
-
-        _tfd = root.getElement('complemento/timbrefiscaldigital')
-        if _tfd is not None:
-            cfdi.setTfd(TimbreFiscalDigital(_tfd.get('uuid')))
 
         _issuer = root.getElement('emisor')
 
@@ -41,10 +57,10 @@ class PayrollParser(InvoiceParserInterface):
 
         _concept = root.getElement('conceptos/concepto')
 
-        if(_concept is not None):
-            _concept = _concept[0] if isinstance(_concept, list) else _concept
-            concept = Concept(_concept.get('descripcion'))
-            cfdi.setConcepts([concept])
+        if(_concept is not None and isinstance(_concept, list)):
+            cfdi.setConcepts([Concept(_concept[0].get('descripcion'))])
+        else:
+            cfdi.setConcepts([Concept(_concept.get('descripcion'))])
 
         _payroll = root.getElement('complemento/nomina')
 
@@ -57,21 +73,21 @@ class PayrollParser(InvoiceParserInterface):
                 'complemento/nomina/deducciones/deduccion')
 
             cfdi.setPayroll(payroll)
-
-            if isinstance(_deductions, list):
-
-                for _deduc in _deductions:
-                    paidTax = self.get_paid_tax_deduction(_deduc)
-                    cfdi.payroll.setPaidTax(paidTax)
-
-            elif _deductions is not None:
-                    paidTax = self.get_paid_tax_deduction(_deductions)
-                    cfdi.payroll.setPaidTax(paidTax)
+            self.assing_deductions(_deductions, cfdi)
 
         return cfdi
-    
 
     def get_paid_tax_deduction(self, _deduc):
         if _deduc.get('tipodeduccion') == '002':
             return _deduc.get('importe') or _deduc.get('importegravado')
-                
+
+    def assing_deductions(self, _deductions, cfdi):
+        if isinstance(_deductions, list):
+
+            for _deduc in _deductions:
+                paid_tax = self.get_paid_tax_deduction(_deduc)
+                if paid_tax is not None:
+                    cfdi.payroll.setPaidTax(paid_tax)
+
+        elif _deductions is not None:
+            cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deductions))

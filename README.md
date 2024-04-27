@@ -1,4 +1,4 @@
-![CI](https://github.com/orbital-zero/sat-invoices-reader/actions/workflows/build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/orbital-zero/sat-invoices-reader/badge.svg?branch=feature/xpath)](https://coveralls.io/github/orbital-zero/sat-invoices-reader?branch=feature/xpath)
+![CI](https://github.com/orbital-zero/sat-invoices-reader/actions/workflows/build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/orbital-zero/sat-invoices-reader/badge.svg)](https://coveralls.io/github/orbital-zero/sat-invoices-reader) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=orbital-zero_sat-invoices-reader&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=orbital-zero_sat-invoices-reader)
 
 
 # sat-invoices-reader
@@ -16,14 +16,18 @@ python -m pip install lxml pyyaml coverage coveralls autopep8
 
 ## Description
 
-Use option -h for help.
+There are two scripts:
 
-    $ main.py -h
+- `main.py` to read payroll and deduction invoices
+- `classify.py` to sort invoices by issuer and their year of creation
 
+Use option -h for get help of each one.
 
 output:
 ```
-usage: main.py [-h] -p path [-t [P,D]] [-x] [-e fileEncoding]
+$ main.py -h
+
+usage: main.py [-h] -p path [-t [P,D]] [-x]
 
 Process to read invoce files from a specified directory (xml or zipped files)
 
@@ -34,8 +38,7 @@ options:
   -t [P,D], --type [P,D]
                         Invoice type, P for payroll (by default) or D for deductions.
   -x, --extract         Extract xml from zipped files.
-  -e fileEncoding, --encoding fileEncoding
-                        Set file encoding to read files, by default 'utf-8'
+
 
 These are an examples to execute the command:
 
@@ -45,8 +48,30 @@ These are an examples to execute the command:
     # read zipped xml files from directory
         ./main.py -p <sourcesPath> -x
 
-    # read zipped xml files from directory using encoding 'iso-8859-1'
-        ./main.py -p <sourcesPath> -x -e iso-8859-1
+-----------------------------------------------------------
+
+$ classify.py -h
+
+usage: classify.py [-h] -p source_path -o target_path [-x]
+
+Classify invoices by issuer and year of creation
+
+options:
+  -h, --help            show this help message and exit
+  -p source_path, --sourcesPath source_path
+                        source directory to read xml files
+  -o target_path, --targetPath target_path
+                        target directory to put sorted xml files
+  -x, --extract         Extract xml from zipped files.
+
+These are an examples to execute the command:
+
+    # sort xml files from a directory
+        ./classify.py -p <sourcesPath> -o <targetPath>
+
+    # extract and sort xml zipped files from a directory
+        ./classify.py -p <sourcesPath> -o <targetPath> -x
+
 ```
 
 ## Testing and code coverage
@@ -108,10 +133,10 @@ python -m autopep8 --list-fixes
 python -m autopep8 -i <filename>
 
 # Select subset of fixes
-python -m autopep8 --select=E225,E231,E301,E302,E303,E265 <filename>
+python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
 
 # Fix issues in aggresive level 1
-python -m autopep8 --in-place --aggressive <filename>
+python -m autopep8 --in-place --aggressive --ignore=E731 <filename>
 
 # Show help
 python -m autopep8 -h
