@@ -22,9 +22,9 @@ class TextConsoleReaderTest(unittest.TestCase):
 
         cls.path = str(Path(__file__).parent) + "/resources/payroll"
         cls.csv = InvoiceReader()
-        cls.csv.setDeductuctionParser(DeductionsParser())
-        cls.csv.setPayrollParser(PayrollParser())
-        cls.csv.setFileReader(CustomizableFileReader())
+        cls.csv.set_deductuction_parser(DeductionsParser())
+        cls.csv.set_payroll_parser(PayrollParser())
+        cls.csv.set_fileReader(CustomizableFileReader())
         cls.reader = TextConsoleReader(cls.csv)
 
     #@unittest.skip

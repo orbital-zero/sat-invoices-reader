@@ -19,35 +19,35 @@ class InvoiceReader:
                  'totalGravado', 'impuestoRetenido', 'saldoNeto']
 
     @property
-    def deductionParser(self) -> InvoiceParserInterface:
+    def deduction_parser(self) -> InvoiceParserInterface:
         return self._deduct_parser
 
-    def setDeductuctionParser(self, _deduct_parser: InvoiceParserInterface):
+    def set_deductuction_parser(self, _deduct_parser: InvoiceParserInterface):
         self._deduct_parser = _deduct_parser
 
     @property
-    def payrollParser(self) -> InvoiceParserInterface:
+    def payroll_parser(self) -> InvoiceParserInterface:
         return self._payroll_parser
 
-    def setPayrollParser(self, _payroll_parser: InvoiceParserInterface):
+    def set_payroll_parser(self, _payroll_parser: InvoiceParserInterface):
         self._payroll_parser = _payroll_parser
 
     @property
     def file_reader(self) -> CustomizableFileReader:
         return self._file_reader
 
-    def setFileReader(self, _reader: CustomizableFileReader):
+    def set_fileReader(self, _reader: CustomizableFileReader):
         self._file_reader = _reader
 
     @property
     def callback(self) -> Callback:
         return self._callback
 
-    def setCallback(self, _callback: Callback):
+    def set_callback(self, _callback: Callback):
         self._callback = _callback
 
     def __init__(self) -> None:
-        self.setCallback(Callback())
+        self.set_callback(Callback())
 
     def read(self, path: str, _type: str):
 
@@ -55,12 +55,12 @@ class InvoiceReader:
             self._read_invoices(
                 path,
                 self.__get_deduction_record,
-                self.deductionParser)
+                self.deduction_parser)
         elif _type == 'P':
             self._read_invoices(
                 path,
                 self.__get_payroll_record,
-                self.payrollParser)
+                self.payroll_parser)
         else:
             raise NotSupportedErr('Invoce type not supported %s' % _type)
 

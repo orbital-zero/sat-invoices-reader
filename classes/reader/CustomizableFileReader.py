@@ -20,6 +20,7 @@ class CustomizableFileReader(FileReaderInterface):
                  _ignore_err: bool = False) -> None:
         self._is_zipped_file = _is_zipped_file
         self._ignore_err = _ignore_err
+        self._file_filter = None
 
     @property
     def ignore_errors(self) -> bool:
@@ -36,7 +37,7 @@ class CustomizableFileReader(FileReaderInterface):
         self._is_zipped_file = read_zip
 
     @property
-    def file_filter(self) -> str:
+    def file_filter(self: str) -> str:
         return self._file_filter
 
     def set_file_filter(self, _file_filter: str):
@@ -45,7 +46,7 @@ class CustomizableFileReader(FileReaderInterface):
     def do_in_list(self, path: str, _callback: Callback):
         """"Iterate files and set the callback operation to execute over each item"""
 
-        self.__set_default_filter()
+        self._file_filter = self.__set_default_filter()
         execute = self.__get_read_function(_callback)
 
         for filename in Path(path).glob(self._file_filter):
@@ -67,14 +68,16 @@ class CustomizableFileReader(FileReaderInterface):
         else:
             return lambda filename: _callback.function(filename)
 
-    def __set_default_filter(self):
+    def __set_default_filter(self) -> str:
         """"Set default value to filter files during read"""
+        
+        if self._file_filter is not None:
+            return self._file_filter
 
-        if self._file_filter is None:
-            if(self._is_zipped_file):
-                self._file_filter = self.__DEFAULT_ZIP_FILTER
-            else:
-                self._file_filter = self.__DEFAULT_FILE_FILTER
+        if(self._is_zipped_file):
+            return self.__DEFAULT_ZIP_FILTER
+        else:
+            return self.__DEFAULT_FILE_FILTER
 
     def __read_zip_content(self, filename, _callback: Callback):
 
