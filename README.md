@@ -133,10 +133,10 @@ python -m autopep8 --list-fixes
 python -m autopep8 -i <filename>
 
 # Select subset of fixes
-python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
+python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E275,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
 
 # Fix issues in aggresive level 1
-python -m autopep8 --in-place --aggressive --ignore=E731 <filename>
+python -m autopep8 --in-place --aggressive --ignore=E731,E275 <filename>
 
 # Show help
 python -m autopep8 -h

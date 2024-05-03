@@ -76,7 +76,7 @@ class InvoiceReader:
             CustomElement.get_tree_parser(),
             _invoice_parser,
             lambda invoice: self.__add_invoice_to_result(invoice, _get_invoice_record)
-            )
+        )
         # self.convert_to_csv(self.callback.result)
 
     def __add_header_to_result(self, headers: list):
