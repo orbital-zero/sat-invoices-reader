@@ -19,7 +19,7 @@ class Callback:
     @property
     def result(self) -> list:
         return self._result
-    
+
     def set_result(self, _result):
         self._result = _result
 

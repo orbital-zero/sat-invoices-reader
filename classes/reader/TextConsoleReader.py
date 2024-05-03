@@ -40,14 +40,14 @@ class TextConsoleReader:
         for e in entries:
             print(e)
 
-    def concat_values(self, values: list) -> list:
+    def concat_values(self, values: list) -> List:
         """ Concatenate values with a field separator """
         return ["|".join(v) + "" for v in values]
 
-    def convert_to_csv(self, invoices: list ) -> list:
+    def convert_to_csv(self, invoices: list) -> List:
         """ Concatenate values with a field separator """
         rows = []
         for item in self.concat_values(invoices):
             rows.append(item)
-                
+
         return rows

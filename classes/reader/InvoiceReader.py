@@ -15,8 +15,8 @@ import io
 class InvoiceReader:
 
     __HEADERS = ['archivo', 'xml version', 'cfdiUuid', 'fecha', 'descripcion',
-                    'fechainicialpago', 'fechafinalpago', 'nombre emisor', 'rfc emisor',
-                    'totalGravado', 'impuestoRetenido', 'saldoNeto']
+                 'fechainicialpago', 'fechafinalpago', 'nombre emisor', 'rfc emisor',
+                 'totalGravado', 'impuestoRetenido', 'saldoNeto']
 
     @property
     def deductionParser(self) -> InvoiceParserInterface:
@@ -52,31 +52,42 @@ class InvoiceReader:
     def read(self, path: str, _type: str):
 
         if _type == 'D':
-            self._read_invoices(path, self.__get_deduction_record, self.deductionParser)
+            self._read_invoices(
+                path,
+                self.__get_deduction_record,
+                self.deductionParser)
         elif _type == 'P':
-            self._read_invoices(path, self.__get_payroll_record, self.payrollParser)
+            self._read_invoices(
+                path,
+                self.__get_payroll_record,
+                self.payrollParser)
         else:
             raise NotSupportedErr('Invoce type not supported %s' % _type)
 
-    def _read_invoices(self, path: str, _get_invoice_record: Callable, _invoice_parser: Callable):
-        _callback = lambda invoice: self.__add_invoice_to_result(invoice, _get_invoice_record)
-        
+    def _read_invoices(
+            self, path: str, _get_invoice_record: Callable, _invoice_parser: Callable):
+
         # add headers
         self.__add_header_to_result(self.__HEADERS)
 
         # Read invoce data
-        self.__read_invoices_from_path(path, CustomElement.get_tree_parser(), _invoice_parser, _callback)
+        self.__read_invoices_from_path(
+            path,
+            CustomElement.get_tree_parser(),
+            _invoice_parser,
+            lambda invoice: self.__add_invoice_to_result(invoice, _get_invoice_record)
+            )
         # self.convert_to_csv(self.callback.result)
 
     def __add_header_to_result(self, headers: list):
         """" Custom function to add field output names to callback result"""
         self.callback.result.append(headers)
 
-    def __add_invoice_to_result(self, invoice: Comprobante, _get_record: Callable):
+    def __add_invoice_to_result(
+            self, invoice: Comprobante, _get_record: Callable):
         """" Custom function to add readed invoices to callback result"""
         if invoice is not None:
             self.callback.result.append(_get_record(invoice))
-
 
     def __get_payroll_record(self, invoice: Comprobante) -> list:
 
@@ -116,7 +127,7 @@ class InvoiceReader:
 
         content = io.BytesIO(zip_file.read(file))
         content_decoded = content.getvalue().decode('utf-8', 'ignore')
-        
+
         if content_decoded.startswith('<?xml'):
             content_without_declaration = content_decoded.split('\n', 1)[1]
         else:
@@ -133,10 +144,10 @@ class InvoiceReader:
         return invoice_parser.parse(str(file), tree)
 
     def __read_invoices_from_path(self, path: str, tree_parser,
-                        invoice_parser: InvoiceParserInterface, _callback: Callable):
-        """Read invoices from xml or compressed files, the invoce parser is neded to conver xml to invoce object, 
+                                  invoice_parser: InvoiceParserInterface, _callback: Callable):
+        """Read invoices from xml or compressed files, the invoce parser is neded to conver xml to invoce object,
             also requiere a custom callback to retrieve or process the invoice data"""
-        
+
         if self.file_reader.is_zipped_file:
             # read xml from zip file
             def reader_callback(filename, zip_file):

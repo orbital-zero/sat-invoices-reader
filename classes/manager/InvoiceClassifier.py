@@ -56,7 +56,8 @@ class InvoiceClassifier:
             self.file_reader.read_zipped_files(True)
 
             def execute(file, zip_file):
-                self.__classify_zipped_invoices(file, zip_file, custom_parser, target)
+                self.__classify_zipped_invoices(
+                    file, zip_file, custom_parser, target)
         else:
             def execute(file):
                 self.__classify_invoices(file, custom_parser, target)
@@ -66,7 +67,8 @@ class InvoiceClassifier:
         self.file_reader.set_file_filter(filter)
         self.file_reader.do_in_list(path, self.callback)
 
-    def __classify_invoices(self, file: Path, parser: etree.XMLParser, target: str):
+    def __classify_invoices(
+            self, file: Path, parser: etree.XMLParser, target: str):
 
         tree: ElementTree = etree.parse(str(file), parser)
         invoice: Comprobante = self.invoice_parser.parse(file.name, tree)

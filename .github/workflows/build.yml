@@ -97,8 +97,8 @@ jobs:
         projectBaseDir: .
         # Additional arguments to the sonarcloud scanner
         args: >
-          -Dsonar.organization=${{ secrets.SONAR_ORG }}
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
+          -Dsonar.organization=${{ vars.SONAR_ORG }}
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY}}
           -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml
           -Dsonar.tests=test/
           -Dsonar.sources=classes/

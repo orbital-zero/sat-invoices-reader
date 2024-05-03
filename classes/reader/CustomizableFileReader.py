@@ -10,12 +10,14 @@ import zipfile
 
 logger = logging.getLogger(__name__)
 
+
 class CustomizableFileReader(FileReaderInterface):
 
     __DEFAULT_ZIP_FILTER = '**/*.zip'
-    __DEFAULT_FILE_FILTER = '**/*.xml' 
+    __DEFAULT_FILE_FILTER = '**/*.xml'
 
-    def __init__(self, _is_zipped_file: bool = False, _ignore_err: bool = False) -> None:
+    def __init__(self, _is_zipped_file: bool = False,
+                 _ignore_err: bool = False) -> None:
         self._is_zipped_file = _is_zipped_file
         self._ignore_err = _ignore_err
 
@@ -40,7 +42,6 @@ class CustomizableFileReader(FileReaderInterface):
     def set_file_filter(self, _file_filter: str):
         self._file_filter = _file_filter
 
-
     def do_in_list(self, path: str, _callback: Callback):
         """"Iterate files and set the callback operation to execute over each item"""
 
@@ -53,27 +54,27 @@ class CustomizableFileReader(FileReaderInterface):
             except Exception as e:
                 _callback.errors.append(e)
                 if not self.ignore_errors:
-                    logger.error('Error with file {0} , skipping...'.format(filename))
+                    logger.error(
+                        'Error with file {0} , skipping...'.format(filename))
                 continue
 
-
-    def __get_read_function(self, _callback: Callback)-> Callable:
+    def __get_read_function(self, _callback: Callback) -> Callable:
         """Get the function to read file (one to one)"""
 
         if self._is_zipped_file:
-            return lambda filename:  self.__read_zip_content(filename, _callback)
+            return lambda filename: self.__read_zip_content(
+                filename, _callback)
         else:
-            return lambda filename:  _callback.function(filename)
+            return lambda filename: _callback.function(filename)
 
     def __set_default_filter(self):
         """"Set default value to filter files during read"""
 
         if self._file_filter is None:
-            if(self._is_zipped_file):  
-                self._file_filter= self.__DEFAULT_ZIP_FILTER 
+            if(self._is_zipped_file):
+                self._file_filter = self.__DEFAULT_ZIP_FILTER
             else:
-                self._file_filter= self.__DEFAULT_FILE_FILTER 
-
+                self._file_filter = self.__DEFAULT_FILE_FILTER
 
     def __read_zip_content(self, filename, _callback: Callback):
 
@@ -87,5 +88,6 @@ class CustomizableFileReader(FileReaderInterface):
             except Exception as e:
                 _callback.errors.append(e)
                 if not self.ignore_errors:
-                    logger.error('Error with file {0} , skipping...'.format(filename))
+                    logger.error(
+                        'Error with file {0} , skipping...'.format(filename))
                 continue
