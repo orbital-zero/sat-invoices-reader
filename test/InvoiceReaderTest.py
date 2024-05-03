@@ -26,7 +26,7 @@ class InvoiceReaderTest(unittest.TestCase):
         self.path = str(Path(__file__).parent) + "/resources/payroll"
         
         self.reader = InvoiceReader()
-        self.reader.set_fileReader(CustomizableFileReader())
+        self.reader.set_file_reader(CustomizableFileReader())
     
     def setUp(self):
         self.reader.set_payroll_parser(PayrollParser())

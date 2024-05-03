@@ -6,19 +6,52 @@ Sat invoices reader, the ones used in Mexico
 
 ## Requirements
 
-- python > 3.X
-
-Additional packages:
+This project is builded on python > 3.X, please consider to create and activate a virtual python environment before to start:
 
 ```bash
-python -m pip install lxml pyyaml coverage coveralls autopep8
+# Create and activate python enironment
+python -m venv pyvenv
+
+## Linux
+.\pyvenv\Scripts\activate
+
+## Windows powershell
+.\pyvenv\Scripts\Activate.ps1
+
+## Windows cmd
+.\pyvenv\Scripts\activate.cmd
 ```
 
-## Description
+In order to leave the virtual enviroinment execute:
+
+```bash
+## Linux
+.\pyvenv\Scripts\deactivate
+
+## Windows powershell
+.\pyvenv\Scripts\dectivate.ps1
+
+## Windows cmd
+.\pyvenv\Scripts\deactivate.bat
+```
+
+The required packages are defined on `requirements.txt` file, and it could be installed as follow:
+
+```bash
+pip install -r requirements.txt
+```
+
+**note:** If new packages are installed the `requiremts.txt` file must be updated using the virtual environment:
+```bash
+pip freeze > requirements.txt
+```
+
+
+## Usage
 
 There are two scripts:
 
-- `main.py` to read payroll and deduction invoices
+- `main.py` to read payroll or deduction invoices from terminal
 - `classify.py` to sort invoices by issuer and their year of creation
 
 Use option -h for get help of each one.
@@ -135,7 +168,7 @@ python -m autopep8 -i <filename>
 # Select subset of fixes
 python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E275,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
 
-# Fix issues in aggresive level 1
+# Fix issues in a file using aggresive level 1
 python -m autopep8 --in-place --aggressive --ignore=E731,E275 <filename>
 
 # Show help

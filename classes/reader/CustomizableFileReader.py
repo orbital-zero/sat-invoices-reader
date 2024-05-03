@@ -70,7 +70,7 @@ class CustomizableFileReader(FileReaderInterface):
 
     def __set_default_filter(self) -> str:
         """"Set default value to filter files during read"""
-        
+
         if self._file_filter is not None:
             return self._file_filter
 

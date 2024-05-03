@@ -7,6 +7,7 @@ from classes.reader.InvoiceReader import InvoiceReader
 from classes.reader.CustomizableFileReader import CustomizableFileReader
 from classes.reader.TextConsoleReader import TextConsoleReader
 from pathlib import Path
+from unittest.mock import patch
 
 import logging
 import logging.config
@@ -24,7 +25,7 @@ class TextConsoleReaderTest(unittest.TestCase):
         cls.csv = InvoiceReader()
         cls.csv.set_deductuction_parser(DeductionsParser())
         cls.csv.set_payroll_parser(PayrollParser())
-        cls.csv.set_fileReader(CustomizableFileReader())
+        cls.csv.set_file_reader(CustomizableFileReader())
         cls.reader = TextConsoleReader(cls.csv)
 
     #@unittest.skip
@@ -36,22 +37,26 @@ class TextConsoleReaderTest(unittest.TestCase):
         final_data = self.reader.convert_to_csv(le)
         logger.info(final_data)
 
-    def test_read_payroll_zip_file(self):
+    @patch('builtins.print')
+    def test_read_payroll_zip_file(self, mock_print):
         self.csv.file_reader.read_zipped_files(True)
         self.reader.read(self.path, 'P')
         self.assertIsNotNone(self.reader.callback.result)
 
-    def test_read_payroll_xml_files(self):
+    @patch('builtins.print')
+    def test_read_payroll_xml_files(self, mock_print):
         self.csv.file_reader.read_zipped_files(False)
         self.reader.read(self.path, 'P')
         self.assertIsNotNone(self.reader.callback.result)
 
-    def test_read_deduction_zip_file(self):
+    @patch('builtins.print')
+    def test_read_deduction_zip_file(self, mock_print):
         self.csv.file_reader.read_zipped_files(True)
         self.reader.read(self.path, 'D')
         self.assertIsNotNone(self.reader.callback.result)
 
-    def test_read_deduction_xml_files(self):
+    @patch('builtins.print')
+    def test_read_deduction_xml_files(self, mock_print):
         self.reader.read(self.path, 'D')
         self.assertIsNotNone(self.reader.callback.result)
 

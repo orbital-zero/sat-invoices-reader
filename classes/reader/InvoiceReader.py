@@ -36,7 +36,7 @@ class InvoiceReader:
     def file_reader(self) -> CustomizableFileReader:
         return self._file_reader
 
-    def set_fileReader(self, _reader: CustomizableFileReader):
+    def set_file_reader(self, _reader: CustomizableFileReader):
         self._file_reader = _reader
 
     @property
