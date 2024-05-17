@@ -104,6 +104,5 @@ jobs:
           -Dsonar.sources=classes/
           -Dsonar.python.flake8.reportPaths=./coverage/flake-report.txt
           -Dsonar.python.version=3.8
-          -Dsonar.scm.provider=git
       #  -Dsonar.test.exclusions=tests/**
       #  -Dsonar.verbose=true
