@@ -61,6 +61,16 @@ class InvoiceClassifierTest(unittest.TestCase):
         self.assertEqual(len(self.manager.callback.errors), 0)
         self.__validate_existing_files(self.manager.callback.result)
 
+    def test_classify_invoices_throwing_err(self):
+
+        def f(x): raise Exception('foobar')
+
+        self.manager.callback.set_function(f)
+        self.manager.classify(self.source_path, self.__get_temp_out_path(), '*.xml')
+
+        self.assertEqual(len(self.manager.callback.errors), 2)
+   
+
     def __get_temp_out_path(self) -> str:
         # Get the current date
         return os.path.join(self.output_path, datetime.datetime.now().strftime("%Y%m%d%H%M_%S%f"))

@@ -64,14 +64,15 @@ class InvoiceClassifier:
             self.file_reader.read_zipped_files(True)
             self.file_reader._zip_filter = '*.xml'
 
-            def execute(
-                file, zip_file): self.__classify_zipped_invoices(
-                file, zip_file, output_path)
+            def execute(file, zip_file):
+                self.__classify_zipped_invoices(file, zip_file, output_path)
 
         else:
 
-            def execute(file): self.__classify_invoices(file, output_path)
+            def execute(file):
+                self.__classify_invoices(file, output_path)
 
+        execute = getattr(self.callback, 'function', execute)
         self.callback.set_function(execute)
 
         self.file_reader.set_file_filter(file_filter)
@@ -128,7 +129,7 @@ class InvoiceClassifier:
         self.callback.result.append(output_file)
 
     def __build_invoice_output_dir(
-            self, invoice: Comprobante, output_path: str) -> str:
+            self, invoice: Comprobante, output_path: str) -> Path:
         # Build output dir name
         match = re.search(self.__DATE_PATTERN, invoice.doc_date)
         year = match.group(1)
