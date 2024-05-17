@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import fnmatch
 from pathlib import Path
 from classes.dto.Callback import Callback
 from classes.reader.FileReaderInterface import FileReaderInterface
@@ -13,14 +14,12 @@ logger = logging.getLogger(__name__)
 
 class CustomizableFileReader(FileReaderInterface):
 
-    __DEFAULT_ZIP_FILTER = '**/*.zip'
-    __DEFAULT_FILE_FILTER = '**/*.xml'
-
     def __init__(self, _is_zipped_file: bool = False,
                  _ignore_err: bool = False) -> None:
         self._is_zipped_file = _is_zipped_file
         self._ignore_err = _ignore_err
         self._file_filter = None
+        self._zip_filter = None
 
     @property
     def ignore_errors(self) -> bool:
@@ -43,10 +42,17 @@ class CustomizableFileReader(FileReaderInterface):
     def set_file_filter(self, _file_filter: str):
         self._file_filter = _file_filter
 
+    @property
+    def zip_filter(self: str) -> str:
+        return self._zip_filter
+
+    def set_zip_filter(self, _zip_filter: str):
+        self._zip_filter = _zip_filter
+
     def do_in_list(self, path: str, _callback: Callback):
         """"Iterate files and set the callback operation to execute over each item"""
 
-        self._file_filter = self.__set_default_filter()
+        self.__set_default_filter()
         execute = self.__get_read_function(_callback)
 
         for filename in Path(path).glob(self._file_filter):
@@ -55,42 +61,38 @@ class CustomizableFileReader(FileReaderInterface):
             except Exception as e:
                 _callback.errors.append(e)
                 if not self.ignore_errors:
-                    logger.error(
-                        'Error with file {0} , skipping...'.format(filename))
+                    logger.error(f'Error with file {filename}, skipping...')
                 continue
 
     def __get_read_function(self, _callback: Callback) -> Callable:
         """Get the function to read file (one to one)"""
+        custom_functions = {
+            "zip_func": lambda filename: self.__read_zip_content(filename, _callback),
+            "file_func": lambda filename: _callback.function(filename)
+        }
+
+        return custom_functions['zip_func'] if self._is_zipped_file else custom_functions['file_func']
+
+    def __set_default_filter(self) -> None:
+        """Set default value to filter files during read"""
 
         if self._is_zipped_file:
-            return lambda filename: self.__read_zip_content(
-                filename, _callback)
+            self._file_filter = self._file_filter or '**/*.zip'
+            self._zip_filter = self._zip_filter or '*.xml'
         else:
-            return lambda filename: _callback.function(filename)
+            self._file_filter = self._file_filter or '**/*.xml'
 
-    def __set_default_filter(self) -> str:
-        """"Set default value to filter files during read"""
+    def __read_zip_content(self, file, _callback: Callback):
 
-        if self._file_filter is not None:
-            return self._file_filter
+        with zipfile.ZipFile(file) as zip_file:
+            for filename in zip_file.namelist():
+                try:
+                    if fnmatch.fnmatch(filename, self._zip_filter):
+                        _callback.function(filename, zip_file)
 
-        if(self._is_zipped_file):
-            return self.__DEFAULT_ZIP_FILTER
-        else:
-            return self.__DEFAULT_FILE_FILTER
-
-    def __read_zip_content(self, filename, _callback: Callback):
-
-        zip_file = zipfile.ZipFile(filename)
-        zipped_files = zip_file.namelist()
-        file_names = [file for file in zipped_files if 'xml' in file]
-
-        for filename in file_names:
-            try:
-                _callback.function(filename, zip_file)
-            except Exception as e:
-                _callback.errors.append(e)
-                if not self.ignore_errors:
-                    logger.error(
-                        'Error with file {0} , skipping...'.format(filename))
-                continue
+                except Exception as e:
+                    err_message = f"Error processing file: {filename} in {zip_file.filename}: \n {e}"
+                    _callback.errors.append(err_message)
+                    if not self.ignore_errors:
+                        logger.error(err_message, exc_info=True)
+                    continue

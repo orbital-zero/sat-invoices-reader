@@ -9,14 +9,15 @@ from classes.reader.CustomizableFileReader import CustomizableFileReader
 from lxml import etree
 from typing import Callable
 import zipfile
-import io
 
 
 class InvoiceReader:
 
-    __HEADERS = ['archivo', 'xml version', 'cfdiUuid', 'fecha', 'descripcion',
-                 'fechainicialpago', 'fechafinalpago', 'nombre emisor', 'rfc emisor',
-                 'totalGravado', 'impuestoRetenido', 'saldoNeto']
+    __PAYROLL_HEADERS = ['archivo', 'xml version', 'cfdiUuid', 'fecha', 'descripcion',
+                         'fechainicialpago', 'fechafinalpago', 'nombre emisor', 'rfc emisor',
+                         'totalGravado', 'impuestoRetenido', 'saldoNeto']
+    __DEDUCTION_HEADERS = ['archivo', 'xml version', 'cfdiUuid', 'fecha', 'descripcion',
+                           'nombre emisor', 'rfc emisor', 'subtotal', 'total']
 
     @property
     def deduction_parser(self) -> InvoiceParserInterface:
@@ -55,27 +56,30 @@ class InvoiceReader:
             self._read_invoices(
                 path,
                 self.__get_deduction_record,
-                self.deduction_parser)
+                self.deduction_parser,
+                self.__DEDUCTION_HEADERS)
         elif _type == 'P':
             self._read_invoices(
                 path,
                 self.__get_payroll_record,
-                self.payroll_parser)
+                self.payroll_parser,
+                self.__PAYROLL_HEADERS)
         else:
             raise NotSupportedErr('Invoce type not supported %s' % _type)
 
     def _read_invoices(
-            self, path: str, _get_invoice_record: Callable, _invoice_parser: Callable):
+            self, path: str, _get_invoice_record: Callable, _invoice_parser: Callable, _headers: list):
 
         # add headers
-        self.__add_header_to_result(self.__HEADERS)
+        self.__add_header_to_result(_headers)
 
         # Read invoce data
         self.__read_invoices_from_path(
             path,
             CustomElement.get_tree_parser(),
             _invoice_parser,
-            lambda invoice: self.__add_invoice_to_result(invoice, _get_invoice_record)
+            lambda invoice: self.__add_invoice_to_result(
+                invoice, _get_invoice_record)
         )
         # self.convert_to_csv(self.callback.result)
 
@@ -102,7 +106,7 @@ class InvoiceReader:
             invoice.issuer.name,
             invoice.issuer.rfc,
             invoice.subtotal,
-            invoice.payroll.paid_tax,
+            getattr(invoice.payroll, '_paid_tax', ''),
             invoice.total
         ]
 
@@ -125,16 +129,11 @@ class InvoiceReader:
                                invoice_parser: InvoiceParserInterface) -> Comprobante:
         """Get an invoice file from zip file, requires a parser to convert invoice"""
 
-        content = io.BytesIO(zip_file.read(file))
-        content_decoded = content.getvalue().decode('utf-8', 'ignore')
+        etree.set_default_parser(tree_parser)
 
-        if content_decoded.startswith('<?xml'):
-            content_without_declaration = content_decoded.split('\n', 1)[1]
-        else:
-            content_without_declaration = content_decoded
-
-        tree = etree.fromstring(content_without_declaration, tree_parser)
-        return invoice_parser.parse(file, tree)
+        with zip_file.open(file) as content_file:
+            tree = etree.parse(content_file)
+            return invoice_parser.parse(file, tree)
 
     def __get_invoice_from_file(self, file: str, tree_parser: etree.XMLParser,
                                 invoice_parser: InvoiceParserInterface) -> Comprobante:
@@ -155,7 +154,8 @@ class InvoiceReader:
                     filename, tree_parser, zip_file, invoice_parser)
                 _callback(invoice)
 
-            file_filter = '**/*.zip'
+            self._file_reader.set_file_filter('**/*.zip')
+            self._file_reader.set_zip_filter('*.xml')
 
         else:
             # read xml from file system
@@ -164,8 +164,7 @@ class InvoiceReader:
                     file, tree_parser, invoice_parser)
                 _callback(invoice)
 
-            file_filter = '**/*.xml'
+            self._file_reader.set_file_filter('**/*.xml')
 
         self.callback.set_function(reader_callback)
-        self._file_reader.set_file_filter(file_filter)
         self._file_reader.do_in_list(path, self.callback)

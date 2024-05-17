@@ -10,3 +10,7 @@ lcov.info
 .coverage
 target
 pyvenv/*
+coverage/
+htmlcov/
+.vscode
+pyenv/

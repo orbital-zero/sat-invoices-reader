@@ -2,10 +2,26 @@
 
 import sys
 import argparse
+import logging
+import logging.config
+
 from classes.parser.DeductionsParser import DeductionsParser
 from classes.parser.PayrollParser import PayrollParser
 from classes.reader.CustomizableFileReader import CustomizableFileReader
+from classes.reader.InvoiceReader import InvoiceReader
 from classes.reader.TextConsoleReader import TextConsoleReader
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        logging.StreamHandler(),
+        # logging.FileHandler('classify.log')
+    ]
+)
+logger = logging.getLogger(__name__)
 
 _epilog = '''
 These are an examples to execute the command:\n
@@ -36,15 +52,16 @@ def main(argv):
 
     args = parser.parse_args()
 
-    reader = TextConsoleReader()
-    reader.setDeductuctionParser(DeductionsParser())
-    reader.setPayrollParser(PayrollParser())
-    reader.setFileReader(CustomizableFileReader())
-
-    if(args.extract):
-        reader.file_reader.read_zipped_files(True)
-
-    reader.read(args.sourcesPath, args.type)
+    invoce_reader = InvoiceReader()
+    invoce_reader.set_deductuction_parser(DeductionsParser())
+    invoce_reader.set_payroll_parser(PayrollParser())
+    
+    invoce_reader.set_file_reader(CustomizableFileReader(args.extract, False))
+    
+    logger.info("Starting invoice read process...")
+    
+    console = TextConsoleReader(invoce_reader)
+    console.read(args.sourcesPath, args.type)
 
 
 if __name__ == "__main__":

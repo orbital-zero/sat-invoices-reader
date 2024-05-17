@@ -26,7 +26,7 @@ class PayrollParser(InvoiceParserInterface):
         root.setNamespaces(cfdi._ns)
 
         _type = root.get('tipodecomprobante')
-        if(_type is not None and _type != 'N'):
+        if (_type is not None and _type != 'N'):
             return
 
         _tfd = root.getElement('complemento/timbrefiscaldigital')
@@ -57,7 +57,7 @@ class PayrollParser(InvoiceParserInterface):
 
         _concept = root.getElement('conceptos/concepto')
 
-        if(_concept is not None and isinstance(_concept, list)):
+        if (_concept is not None and isinstance(_concept, list)):
             cfdi.setConcepts([Concept(_concept[0].get('descripcion'))])
         else:
             cfdi.setConcepts([Concept(_concept.get('descripcion'))])
@@ -82,12 +82,11 @@ class PayrollParser(InvoiceParserInterface):
             return _deduc.get('importe') or _deduc.get('importegravado')
 
     def assing_deductions(self, _deductions, cfdi):
-        if isinstance(_deductions, list):
-
+        if isinstance(_deductions, list) and len(_deductions) > 0:
             for _deduc in _deductions:
                 paid_tax = self.get_paid_tax_deduction(_deduc)
                 if paid_tax is not None:
                     cfdi.payroll.setPaidTax(paid_tax)
 
-        elif _deductions is not None:
+        elif _deductions is not None and (len(_deductions) > 0):
             cfdi.payroll.setPaidTax(self.get_paid_tax_deduction(_deductions))

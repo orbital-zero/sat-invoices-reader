@@ -10,29 +10,29 @@ This project is builded on python > 3.X, please consider to create and activate 
 
 ```bash
 # Create and activate python enironment
-python -m venv pyvenv
+python -m venv pyenv
 
 ## Linux
-.\pyvenv\Scripts\activate
+.\pyenv\Scripts\activate
 
 ## Windows powershell
-.\pyvenv\Scripts\Activate.ps1
+.\pyenv\Scripts\Activate.ps1
 
 ## Windows cmd
-.\pyvenv\Scripts\activate.cmd
+.\pyenv\Scripts\activate.cmd
 ```
 
-In order to leave the virtual enviroinment execute:
+In order to leave the virtual environment execute:
 
 ```bash
 ## Linux
-.\pyvenv\Scripts\deactivate
+.\pyenv\Scripts\deactivate
 
 ## Windows powershell
-.\pyvenv\Scripts\dectivate.ps1
+.\pyenv\Scripts\dectivate.ps1
 
 ## Windows cmd
-.\pyvenv\Scripts\deactivate.bat
+.\pyenv\Scripts\deactivate.bat
 ```
 
 The required packages are defined on `requirements.txt` file, and it could be installed as follow:
@@ -96,15 +96,21 @@ options:
   -o target_path, --targetPath target_path
                         target directory to put sorted xml files
   -x, --extract         Extract xml from zipped files.
+  -u, --uuid_names      The output file will be renamed by their invoice uuid
 
 These are an examples to execute the command:
 
-    # sort xml files from a directory
+    # sort xml files by invoice year and issuer from source directory, then leave it in another directory
         ./classify.py -p <sourcesPath> -o <targetPath>
 
-    # extract and sort xml zipped files from a directory
+    # sort xml files by invoice year and issuer from source directory, then leave it in another directory changing names by uuid value
+        ./classify.py -p <sourcesPath> -o <targetPath> -u
+
+    # extract and sort xml zipped files from a directory and leave it in another one
         ./classify.py -p <sourcesPath> -o <targetPath> -x
 
+    # extract and sort xml zipped files from a directory and leave it in another one changing their names by uuid value
+        ./classify.py -p <sourcesPath> -o <targetPath> -xu
 ```
 
 ## Testing and code coverage

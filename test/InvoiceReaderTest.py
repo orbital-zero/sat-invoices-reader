@@ -24,11 +24,10 @@ class InvoiceReaderTest(unittest.TestCase):
     def setUpClass(self):
         logging.config.fileConfig('./test/resources/logger-tests.conf')
         self.path = str(Path(__file__).parent) + "/resources/payroll"
-        
         self.reader = InvoiceReader()
-        self.reader.set_file_reader(CustomizableFileReader())
     
     def setUp(self):
+        self.reader.set_file_reader(CustomizableFileReader())
         self.reader.set_payroll_parser(PayrollParser())
         self.reader.set_deductuction_parser(DeductionsParser())
 
@@ -52,19 +51,18 @@ class InvoiceReaderTest(unittest.TestCase):
         self.reader.file_reader.read_zipped_files(True)
         self.reader.file_reader.set_ignore_errors(True)
         self.reader.read(self.path, 'P')
-        #logger.info(self.reader.callback.errors)
         self.assertGreater(len(self.reader.callback.result), 1)
 
     def test_read_deduction_files(self):
         self.reader.file_reader.read_zipped_files(False)
         self.reader.read(self.path, 'D')
-        #self.__print_csv_content(self.reader.callback_result)
+        self.__print_result(self.reader.callback.result)
         self.assertGreater(len(self.reader.callback.result), 1)
         
     def test_read_deduction_zip_files(self):
         self.reader.file_reader.read_zipped_files(True)
         self.reader.read(self.path, 'D')
-        #self.__print_csv_content(self.reader.callback_result)
+        self.__print_result(self.reader.callback.result)
         self.assertGreater(len(self.reader.callback.result), 1)
 
     def __print_result(self, _entries: list):

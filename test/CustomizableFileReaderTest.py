@@ -14,13 +14,15 @@ logger = logging.getLogger(__name__)
 
 class CustomizableFileReaderTest(unittest.TestCase):
 
+    __FILTER_FOR_ZIP = '**/*.zip'
+    __FILTER_FOR_XML = '**/*.xml'
+
     @classmethod
     def setUpClass(cls):
-        # cls.file_reader = CustomizableFileReader()
-        cls.zip_path = str(Path(__file__).parent) + \
-            "/resources/payroll/zip_file"
-        cls.one_file = str(Path(__file__).parent) + \
-            "/resources/payroll/one_file"
+        resources_dir= str(Path(__file__).parent) +"/resources/"
+        cls.zip_file = resources_dir + "/payroll/zip_file"
+        cls.one_file = resources_dir + "/payroll/one_file"
+        cls.zipped_files = resources_dir + "/payroll/zipped_files"
         logging.config.fileConfig(
             fname='./test/resources/logger-tests.conf',
             disable_existing_loggers=False)
@@ -28,28 +30,30 @@ class CustomizableFileReaderTest(unittest.TestCase):
     def setUp(self):
         '''@Before - Setup method to be executed before each test method'''
         self.file_reader = CustomizableFileReader()
+        self.file_reader.set_zip_filter = "*.xml"
 
-    def test_list_xml_files(self):
+    def test_read_xml_file(self):
         """Test reading one xml file"""
 
         callback = Callback()
         callback.set_function(lambda filename:
                               self.__fault_file_callback(filename, callback.result))
-        # self.file_reader.read_ziped_files(False)  #  False by default
-        self.file_reader.set_file_filter('**/*.xml')
+
+        self.file_reader.set_file_filter(self.__FILTER_FOR_XML)
         self.file_reader.do_in_list(self.one_file, callback)
         self.assertEqual(len(callback.result), 1)
 
-    def test_list_zip_files(self):
+    def test_list_zip_content(self):
         """Test reading zip files and their content on defined path"""
 
+        def f(filename, zip_file): self.__fault_zip_callback(filename, zip_file, callback.result)
+
         callback = Callback()
-        callback.set_function(lambda filename, zip_file:
-                               self.__fault_zip_callback(filename, zip_file, callback.result))
+        callback.set_function(f)
 
         self.file_reader.read_zipped_files(True)
-        self.file_reader.set_file_filter('**/*.zip')
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.set_file_filter(self.__FILTER_FOR_ZIP)
+        self.file_reader.do_in_list(self.zip_file, callback)
         self.assertEqual(len(callback.result), 3)
 
     def __fault_file_callback(self, filename: str, _result):
@@ -68,8 +72,8 @@ class CustomizableFileReaderTest(unittest.TestCase):
                                self.__fault_err_callback(filename, zip_file))
 
         self.file_reader.read_zipped_files(True)
-        self.file_reader.set_file_filter('**/*.zip')
-        self.file_reader.do_in_list(self.zip_path, callback )
+        self.file_reader.set_file_filter(self.__FILTER_FOR_ZIP)
+        self.file_reader.do_in_list(self.zip_file, callback )
         self.assertEqual(len(callback.errors), 3)
 
     def __fault_err_callback(self, filename: str, zip_file: zipfile.ZipFile):
@@ -85,8 +89,8 @@ class CustomizableFileReaderTest(unittest.TestCase):
 
         self.file_reader.read_zipped_files(True)
         self.file_reader.set_ignore_errors(True)
-        self.file_reader.set_file_filter('**/*.zip')
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.set_file_filter(self.__FILTER_FOR_ZIP)
+        self.file_reader.do_in_list(self.zip_file, callback)
         self.assertEqual(len(callback.errors), 3)
 
     def test_err_file_callback(self):
@@ -97,7 +101,7 @@ class CustomizableFileReaderTest(unittest.TestCase):
         callback = Callback()
         callback.set_function(f)
 
-        self.file_reader.set_file_filter('**/*.xml')
+        self.file_reader.set_file_filter(self.__FILTER_FOR_XML)
         self.file_reader.do_in_list(self.one_file, callback)
         self.assertEqual(len(callback.errors), 1)
 
@@ -108,10 +112,10 @@ class CustomizableFileReaderTest(unittest.TestCase):
 
         callback = Callback()
         callback.set_function(f)
-        # self.file_reader.set_file_filter('**/*.zip') # NON SET
 
+        self.file_reader.set_zip_filter = None
         self.file_reader.read_zipped_files(True)
-        self.file_reader.do_in_list(self.zip_path, callback)
+        self.file_reader.do_in_list(self.zip_file, callback)
         self.assertEqual(len(callback.result), 3)
 
     def test_without_xml_fillter(self):
@@ -121,6 +125,19 @@ class CustomizableFileReaderTest(unittest.TestCase):
 
         callback = Callback()
         callback.set_function(f)
-        #self.file_reader.set_file_filter(None) # NON SET
+        self.file_reader.set_file_filter(None) 
         self.file_reader.do_in_list(self.one_file, callback)
+        self.assertEqual(len(callback.result), 1)
+        
+    def test_filter_zip_content(self):
+        """Test to read a pdf file name using filters"""
+        
+        def f(filename, zip_file): self.__fault_zip_callback(filename, zip_file, callback.result)
+
+        callback = Callback()
+        callback.set_function(f)
+        self.file_reader.read_zipped_files(True)
+        self.file_reader.set_file_filter(self.__FILTER_FOR_ZIP) 
+        self.file_reader._zip_filter = "*.pdf"
+        self.file_reader.do_in_list(self.zipped_files, callback)
         self.assertEqual(len(callback.result), 1)

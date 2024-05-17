@@ -30,7 +30,8 @@ class TextConsoleReader:
         formated_data = self.convert_to_csv(self.reader.callback.result)
         self.__print_list_values(formated_data)
 
-        if(self.reader.callback.errors is not None and len(self.reader.callback.errors) >= 1):
+        if (self.reader.callback.errors is not None and len(
+                self.reader.callback.errors) >= 1):
             print("----------------------------")
             print("List of errors and warnings:")
             self.__print_list_values(self.reader.callback.errors)

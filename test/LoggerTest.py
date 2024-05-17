@@ -10,7 +10,7 @@ import logging
 class LoggerTest(unittest.TestCase):
 
     #fileConfig('logging_config.ini')
-    logger = logging.getLogger('testLogger')
+    logger = logging.getLogger('testLogging')
 
     @classmethod
     def setUpClass(cls):
