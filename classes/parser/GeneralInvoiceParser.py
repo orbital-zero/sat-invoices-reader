@@ -23,7 +23,7 @@ class GeneralInvoiceParser(InvoiceParserInterface):
         cfdi.setDate(root.get('fecha'))
 
         _type = root.get('tipodecomprobante')
-        if(_type is not None):
+        if (_type is not None):
             cfdi.setType(_type)
 
         _issuer = root.getElement('emisor')

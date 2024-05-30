@@ -2,9 +2,10 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 # To   setup env variables see: https://docs.github.com/es/actions/learn-github-actions/environment-variables
 
-name: build
+name: SAT Invoice reader package
 
 on:
+  workflow_dispatch:
   push:
     branches: [ feature/*, release/*, master ]
   pull_request:
@@ -12,7 +13,7 @@ on:
 
 jobs:
   build:
-
+    name: Build stage
     if: ${{ github.event.pull_request.merged == true || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     strategy:
@@ -21,52 +22,83 @@ jobs:
         python-version: ["3.8"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest lxml==4.8.0 coverage
+          # python -m pip install unittest2
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        if: ${{ success() }}
+          # stop the build if there are Python syntax errors or undefined names
+          # # python -m flake8 classes --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        run: |
+          python -m flake8 classes --count --exit-zero --ignore=E731,E275 --max-complexity=10 --max-line-length=127 --statistics --output-file coverage/flake-report.txt
+      - name: Unit Tests
+        id: tests
+        run: |
+          python -m coverage run --source=classes -m unittest discover -s ./test -p "*Test.py"
+          python -m coverage lcov -o ./coverage/lcov.info
+          python -m coverage xml -o ./coverage/coverage.xml
+        #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
+        # python -m coverage run --source=classes -m pytest test
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: workspace-output
+          path: |
+            coverage/
+            classes/
+            test/
+          retention-days: 1 
+          overwrite: true   
+
+  coverage:
+    name: Code inspection
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download all workflow run artifacts
+      uses: actions/download-artifact@v4
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest lxml==4.8.0 coverage
-        # python -m pip install unittest2
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
+        name: workspace-output
+        path: .
+    - name: Display structure of downloaded files
+      run: ls -R
+    - name: Analyze with Coveralls
       if: ${{ success() }}
-        # stop the build if there are Python syntax errors or undefined names
-        # # python -m flake8 classes --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-      run: |
-        python -m flake8 classes --count --exit-zero --ignore=E731 --max-complexity=10 --max-line-length=127 --statistics --output-file coverage/flake-report.txt
-    - name: Test
-      run: |
-        python -m coverage run --source=classes -m unittest discover -s ./test -p "*Test.py"
-        python -m coverage lcov -o ./coverage/lcov.info
-        python -m coverage xml -o ./coverage/coverage.xml
-      #  sed -i "s/<source>\/home\/runner\/work\/sat-invoices-reader<\/source>/<source>\/github\/workspace<\/source>/g"  /home/runner/work/sat-invoices-reader/sat-invoices-reader/coverage/coverage.xml
-      # python -m coverage run --source=classes -m pytest test
-      
-    - name: Coveralls Scan
-      if: ${{ success() }}
-      uses: coverallsapp/github-action@1.1.3
+      uses: coverallsapp/github-action@v2.2.3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         git-branch: ${{ github.ref }}
         flag-name: Unit
-    - name: SonarCloud Scan
+    - name: Analyze with SonarCloud
+      #if: ${{ steps.tests.conclusion == 'success' }}
       if: ${{ success() }}
       # You may pin to the exact commit or the version.
       # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
       # https://github.com/marketplace/actions/sonarcloud-scan
-      uses: SonarSource/sonarcloud-github-action@v1.6
+      uses: SonarSource/sonarcloud-github-action@v2.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
       with:
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: .
         # Additional arguments to the sonarcloud scanner
         args: >
-          -Dsonar.organization=${{ secrets.SONAR_ORG }}
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY}}
+          -Dsonar.organization=${{ vars.SONAR_ORG }}
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY}}
           -Dsonar.python.coverage.reportPaths=./coverage/coverage.xml
           -Dsonar.tests=test/
           -Dsonar.sources=classes/
@@ -74,6 +106,3 @@ jobs:
           -Dsonar.python.version=3.8
       #  -Dsonar.test.exclusions=tests/**
       #  -Dsonar.verbose=true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

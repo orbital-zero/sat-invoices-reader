@@ -29,7 +29,7 @@ class CustomElement(etree.ElementBase):
         el = etree.XPath(self.__XPATH_GET_ATTR.format(key),
                          namespaces=self.__NS_MAP)(self)
 
-        if(el and isinstance(el, list)):
+        if (el and isinstance(el, list)):
             return el[0]
         else:
             return None
@@ -107,7 +107,7 @@ class CustomElement(etree.ElementBase):
         return re.search(cls.__NESTED_PATH_PATTERN, path)
 
     def __empty_filter(self, el):
-        if(isinstance(el, list)):
+        if (isinstance(el, list)):
             return el[0] if (len(el) == 1) else el
         else:
             return None

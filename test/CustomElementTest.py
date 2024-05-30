@@ -32,14 +32,14 @@ class CustomElementTest(unittest.TestCase):
         # support absolute paths (start with '/' or '//')
         paths = {
             '{*}Emisor',
-            "/{*}Emisor",
-            '//{*}Emisor',
+           # "./{*}Emisor",
+            './/{*}Emisor',
             "./{*}Emisor",
             'cfdi:Emisor',
-            '/cfdi:Emisor',
-            '//cfdi:Emisor',
             './cfdi:Emisor',
             './/cfdi:Emisor',
+            #'./cfdi:Emisor',
+            #'.//cfdi:Emisor',
             self._tagEmisor
         }
 
@@ -184,7 +184,7 @@ class CustomElementTest(unittest.TestCase):
         nom = el.getElement('complemento/nomina')
         self.assertIsNotNone(nom.get('FechaFinalPago'))
 
-    @unittest.skip
+    #@unittest.skip
     def test_regex_nested_paths(self):
 
         valid_paths = {

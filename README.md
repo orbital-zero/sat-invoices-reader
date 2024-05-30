@@ -6,19 +6,52 @@ Sat invoices reader, the ones used in Mexico
 
 ## Requirements
 
-- python > 3.X
-
-Additional packages:
+This project is builded on python > 3.X, please consider to create and activate a virtual python environment before to start:
 
 ```bash
-python -m pip install lxml pyyaml coverage coveralls autopep8
+# Create and activate python enironment
+python -m venv pyenv
+
+## Linux
+.\pyenv\Scripts\activate
+
+## Windows powershell
+.\pyenv\Scripts\Activate.ps1
+
+## Windows cmd
+.\pyenv\Scripts\activate.cmd
 ```
 
-## Description
+In order to leave the virtual environment execute:
+
+```bash
+## Linux
+.\pyenv\Scripts\deactivate
+
+## Windows powershell
+.\pyenv\Scripts\dectivate.ps1
+
+## Windows cmd
+.\pyenv\Scripts\deactivate.bat
+```
+
+The required packages are defined on `requirements.txt` file, and it could be installed as follow:
+
+```bash
+pip install -r requirements.txt
+```
+
+**note:** If new packages are installed the `requiremts.txt` file must be updated using the virtual environment:
+```bash
+pip freeze > requirements.txt
+```
+
+
+## Usage
 
 There are two scripts:
 
-- `main.py` to read payroll and deduction invoices
+- `main.py` to read payroll or deduction invoices from terminal
 - `classify.py` to sort invoices by issuer and their year of creation
 
 Use option -h for get help of each one.
@@ -63,15 +96,21 @@ options:
   -o target_path, --targetPath target_path
                         target directory to put sorted xml files
   -x, --extract         Extract xml from zipped files.
+  -u, --uuid_names      The output file will be renamed by their invoice uuid
 
 These are an examples to execute the command:
 
-    # sort xml files from a directory
+    # sort xml files by invoice year and issuer from source directory, then leave it in another directory
         ./classify.py -p <sourcesPath> -o <targetPath>
 
-    # extract and sort xml zipped files from a directory
+    # sort xml files by invoice year and issuer from source directory, then leave it in another directory changing names by uuid value
+        ./classify.py -p <sourcesPath> -o <targetPath> -u
+
+    # extract and sort xml zipped files from a directory and leave it in another one
         ./classify.py -p <sourcesPath> -o <targetPath> -x
 
+    # extract and sort xml zipped files from a directory and leave it in another one changing their names by uuid value
+        ./classify.py -p <sourcesPath> -o <targetPath> -xu
 ```
 
 ## Testing and code coverage
@@ -133,10 +172,10 @@ python -m autopep8 --list-fixes
 python -m autopep8 -i <filename>
 
 # Select subset of fixes
-python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
+python -m autopep8 --select=E225,E231,E301,E302,E303,E305,E265,W291,W292,W293,W391,E271,E275,E306,E271,E251,E111,E117,E128,E203,F401,F811 <filename>
 
-# Fix issues in aggresive level 1
-python -m autopep8 --in-place --aggressive --ignore=E731 <filename>
+# Fix issues in a file using aggresive level 1
+python -m autopep8 --in-place --aggressive --ignore=E731,E275 <filename>
 
 # Show help
 python -m autopep8 -h

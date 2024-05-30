@@ -2,7 +2,7 @@
 
 import abc
 
-from classes.reader.Callback import Callback
+from classes.dto.Callback import Callback
 
 
 class FileReaderInterface(metaclass=abc.ABCMeta):
@@ -13,5 +13,8 @@ class FileReaderInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def do_in_list(self, path: str, _callback: Callback):
-        """List files and execute a custom operation during looping"""
+        """
+            Execute a custom operation during file iteration in a defined path,
+            the callback function is excuted on each file
+        """
         raise NotImplementedError

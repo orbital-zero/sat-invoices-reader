@@ -33,7 +33,7 @@ class DeductionsParser(InvoiceParserInterface):
 
         _concept = root.getElement('conceptos/concepto')
 
-        if(_concept is not None):
+        if (_concept is not None):
             _concept = _concept[0] if isinstance(_concept, list) else _concept
             concept = Concept(_concept.get('descripcion'))
             cfdi.setConcepts([concept])

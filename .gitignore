@@ -9,3 +9,8 @@ lcov.info
 .pytest_cache
 .coverage
 target
+pyvenv/*
+coverage/
+htmlcov/
+.vscode
+pyenv/

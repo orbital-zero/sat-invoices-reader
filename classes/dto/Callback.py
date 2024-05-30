@@ -10,7 +10,7 @@ class Callback:
         self._result = []
 
     @property
-    def function(self) -> typing.Any:
+    def function(self) -> typing.Callable:
         return self._function
 
     def set_function(self, _function):
@@ -19,6 +19,9 @@ class Callback:
     @property
     def result(self) -> list:
         return self._result
+
+    def set_result(self, _result):
+        self._result = _result
 
     @property
     def errors(self) -> list:
